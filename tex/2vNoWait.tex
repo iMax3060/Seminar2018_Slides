@@ -1,0 +1,34 @@
+\newcommand{\twoVNoWaitDiagram}[1][1.0]{%
+	\tikzset{
+		invocation/.style = {text = beamer@blendedblue},
+		transaction/.style = {draw = beamer@blendedblue,
+					       text = beamer@blendedblue,
+					       thin,
+					       inner sep = 0.1pt,
+					       shape = circle,
+					       scale = 0.9},
+		cancel/.style = {draw = red,
+					thin,
+					shape = cross out,
+					inner sep = .5em,
+					anchor = center,
+					scale = 0.9},
+		axis/.style = { -> ,
+				    draw = beamer@blendedblue,
+				    fill = beamer@blendedblue,
+				    text = beamer@blendedblue,
+				    thick}
+	}	
+
+	\begin{tikzpicture}[opacity = #1,
+	                             baseline = (current bounding box.center),
+	                             node distance = .5em]
+		\node[invocation]					(i1)			{\lock{1}{a}{X}};
+		\node[invocation, below = of i1]			(i2)			{\lock{2}{a}{S}};
+		\node[invocation, below = of i2]			(i3)			{\cancelledLock{3}{a}{X}};
+		\node[invocation, below = of i3]			(i4)			{\unlock{2}{a}};
+		\node[invocation, below = of i4]			(i5)			{\lock{1}{a}{C}};
+		
+		\draw[axis, xshift = 2em]	(i1.north east)	--	(i5.south east)	node[pos = 0.925, right]{$t$};
+	\end{tikzpicture}%
+}

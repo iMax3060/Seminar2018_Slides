@@ -1,0 +1,752 @@
+\section[Performance Evaluation]{Performance Evaluation} \label{sec:evaluation}
+
+ \begin{frame}
+	\sectionpage
+	
+	\vspace{3em}
+	
+	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
+	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
+	\newcommand{\neutral}{\textcolor{black!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{black}{\kern-0.9em\bm{$\odot$}}}
+	
+	\centering
+	\begin{tabular}{| c | c | c | c | c |}
+																								\cline{2-5}
+		\multicolumn{1}{c|}{}		&	SE/NP	&	DORA	&	Delegation	&	PSE					\\	\hline
+		\lstinline{DL\_DETECT}	&	\plus		&	\plus		&	\plus			&	\multirow{4}{*}{\neutral}	\\	\cline{1-4}
+		\lstinline{NO\_WAIT}		&	\plus		&	\plus		&	\plus			&						\\	\cline{1-4}
+		\lstinline{2V\_NO\_WAIT}	&	\plus		&	\plus		&	\plus			&						\\	\cline{1-4}
+		\lstinline{SILO}			&	\plus		&	\minus	&	\plus			&						\\	\hline
+	\end{tabular}
+\end{frame}
+
+\tikzset{
+	commonMark/.style = {scale = 1.5},
+	legendArchitecture/.style = {mark = x},
+	legendCC/.style = {color = black!80, mark options = {fill = black!40, commonMark}},
+	se/.style = {color = red, mark options = {fill = red!50, commonMark}},
+	dora/.style = {color = blue, mark options = {fill = blue!50, commonMark}},
+	delegation/.style = {color = orange, mark options = {fill = orange!50, commonMark}},
+	pse/.style = {color = ForestGreen, mark options = {fill = ForestGreen!50, commonMark}, mark = pentagon*},
+	dlDetect/.style = {mark = square*},
+	noWait/.style = {mark = *},
+	2vNoWait/.style = {mark = oplus*},
+	silo/.style = {mark = triangle*},
+	abortRate/.style = {dashed, every mark/.append style = {solid, scale = 0.75}}
+}
+
+%\makeatletter%
+%\ifcsundef{r@label:se}{%
+	\begin{tikzpicture}[outer sep = 0pt, inner sep = 0pt]
+		\pgfplotsset{
+			legend image code/.code = {
+				\draw[mark repeat = 2, mark phase = 2]
+				plot coordinates {
+					(0cm, 0cm)
+					(0.15cm, 0cm)       %% default is (0.3cm,0cm)
+					(0.3cm, 0cm)         %% default is (0.6cm,0cm)
+				};%
+			}
+		}
+		\begin{axis}[hide axis,
+				   xmin = 10,
+				   xmax = 50,
+				   ymin = 0,
+				   ymax = 0.4]
+	 		\addlegendimage{se, legendArchitecture}
+	 		\label{label:se}
+	 		\addlegendimage{dlDetect, legendCC}
+	 		\label{label:dlDetect}
+	 		\addlegendimage{dora, legendArchitecture}
+	 		\label{label:dora}
+	 		\addlegendimage{noWait, legendCC}
+	 		\label{label:noWait}
+	 		\addlegendimage{delegation, legendArchitecture}
+	 		\label{label:delegation}
+	 		\addlegendimage{2vNoWait, legendCC}
+	 		\label{label:2vNoWait}
+	 		\addlegendimage{pse}
+	 		\label{label:pse}
+	 		\addlegendimage{silo, legendCC}
+	 		\label{label:silo}
+	 		\addlegendimage{abortRate, legendArchitecture}
+	 		\label{label:abort}
+	    \end{axis}
+	\end{tikzpicture}%
+%}{}%
+%\makeatother%
+
+ \begin{frame}
+	\frametitle{Evaluation Set-Up}
+	
+	\begin{itemize}
+		\visible<2->{\item	4x Intel Xeon E7-8890 v3 NUMA machine (72 cores @ \SI{2.5}{\giga\hertz})}
+		\visible<2->{\item	\SI{32}{\kilo\byte} L1I cache and \SI{32}{\kilo\byte} L1D cache per core}
+		\visible<2->{\item	\SI{256}{\kilo\byte} L2 cache per core}
+		\visible<2->{\item	\SI{45}{\mega\byte} L3 cache per CPU}
+		\visible<3->{\item	\SI{512}{\giga\byte} DDR4 RAM}
+		\visible<4->{\item	hyperThreading not used}
+		\visible<4->{\item	threads pinned to physical cores}
+		\visible<4->{\item	sockets filled sequentially with threads}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Benchmarks}
+	
+	\begin{block}{Microbenchmark}
+		\vspace{-.5em}
+		\begin{itemize}
+			\item	\SI{13}{\giga\byte} database
+			\item	Hot Set: $16$ records \emph{distributed to 16 partitions}
+			\item	Cold Set: $\num{100000000} - 16$ records
+			\item	Txn: 2 accesses to Hot Set \& 8 accesses to \emph{(thread-local)} Cold Set
+		\end{itemize}
+	\end{block}
+	\vspace{-.25em}	
+	\begin{block}{Yahoo! Cloud Serving Benchmark (YCSB)}
+		\vspace{-.5em}
+		\begin{itemize}
+			\item	\SI{20}{\giga\byte} database
+			\item	\num{20000000} records
+			\item	Txn: reads/updates 16 records following zipfian distribution according to parameter $\Theta$
+		\end{itemize}
+	\end{block}
+\end{frame}
+
+\subsection[Read-Only Workload]{Read-Only Workload} \label{subsec:read}
+
+ \begin{frame}
+	\frametitle{Read-Only Microbenchmark}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 20,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = north west,
+ 							   legend columns = 2,
+ 							   legend style = {font = \small},
+ 							   width = \linewidth,
+ 							   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, dlDetect, visible on = <2->]		table[x = Threads, y = SE]				{./data/read_only_dl_detect_2a.csv};
+ 						\addplot[delegation, dlDetect, visible on = <2->]	table[x = Threads, y = Delegation]		{./data/read_only_dl_detect_2a.csv};
+ 						\addplot[dora, dlDetect, visible on = <2->]		table[x = Threads, y = DORA]			{./data/read_only_dl_detect_2a.csv};
+ 						\addplot[se, noWait, visible on = <5->]		table[x = Threads, y = SE]				{./data/read_only_no_wait_2b.csv};
+ 						\addplot[delegation, noWait, visible on = <8->]	table[x = Threads, y = Delegation]		{./data/read_only_no_wait_2b.csv};
+ 						\addplot[dora, noWait, visible on = <8->]		table[x = Threads, y = DORA]			{./data/read_only_no_wait_2b.csv};
+ 						\addplot[se, 2vNoWait, visible on = <10->]		table[x = Threads, y = 2V_NO_WAIT]	{./data/read_only_best_architecture_2c.csv};
+ 						\addplot[se, silo, visible on = <12->]			table[x = Threads, y = SILO]			{./data/read_only_best_architecture_2c.csv};
+ 						\addplot[pse, visible on = <14->]			table[x = Threads, y = PSE]			{./data/read_only_best_architecture_2c.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-8>{\item	\ref{label:dora}/\ref{label:delegation} suffer from remote data access overhead}
+					\only<4-10>{\item	\ref{label:se} suffers from latch contention on locks}
+					\only<6-12>{\item	atomics of \ref{label:noWait} outperform latches of \ref{label:dlDetect}}
+					\only<7-14>{\item	scaling of \ref{label:noWait} limited by hardware cache coherence mechanism}
+					\only<9->{\item	\ref{label:dora}/\ref{label:delegation} suffer more from remote data accesses than \ref{label:se} suffers from cache coherence}
+					\only<11->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for read-only}
+					\only<13->{\item	\ref{label:silo} behaves identical for \ref{label:se} and \ref{label:delegation} for read-only}
+					\only<15->{\item	coarse-grained partition locking of \ref{label:pse} doesn't scale due to multi-site workload}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Multi-Site Read-Only Microbenchmark}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {Number of Remote Records},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 10,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 20,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = north east,
+ 							   legend columns = 2,
+ 							   legend style = {font = \small},
+ 							   width = \linewidth,
+ 							   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, noWait, visible on = <2->]		table[x = RemoteRecords, y = SE]		{./data/read_only_multi_site_transactions_2d.csv};
+ 						\addplot[delegation, noWait, visible on = <4->]	table[x = RemoteRecords, y = Delegation]	{./data/read_only_multi_site_transactions_2d.csv};
+ 						\addplot[dora, noWait, visible on = <4->]		table[x = RemoteRecords, y = DORA]	{./data/read_only_multi_site_transactions_2d.csv};
+ 						\addplot[pse, visible on = <7->]				table[x = RemoteRecords, y = PSE]		{./data/read_only_multi_site_transactions_2d.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-7>{\item	\ref{label:se} doesn't know remote records}
+					\only<5-8>{\item	\ref{label:dora}/\ref{label:delegation} outperform \ref{label:se} for $0$ remote records due to lower cache coherence activity}
+					\only<6->{\item	\ref{label:dora}/\ref{label:delegation} suffer from remote data access overhead for $>0$ remote records}
+					\only<8->{\item	coarse-grained partition locking of \ref{label:pse} imposes nearly no overhead for suitable partitioning}
+					\only<9->{\item	coarse-grained partition locking of \ref{label:pse} limits the concurrency drastically for $>0$ remote records}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\subsection[Update-Only Workload]{Update-Only Workload} \label{subsec:update}
+
+ \begin{frame}
+	\frametitle{Update-Only Microbenchmark}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\pgfplotsset{set layers}
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 1,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+ 							   axis y line* = left,
+ 							   grid = major,
+ 							   scale only axis,
+ 							   width = \linewidth,
+ 							   height = .9\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\label{plot:se}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\label{plot:dlDetect}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\label{plot:dora}
+ 						\addlegendimage{noWait, legendCC}
+ 						\label{plot:noWait}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\label{plot:delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\label{plot:2vNoWait}
+ 						\addlegendimage{pse}
+ 						\label{plot:pse}
+ 						\addlegendimage{silo, legendCC}
+ 						\label{plot:silo}
+ 						\addlegendimage{abortRate, legendArchitecture}
+ 						\label{plot:abort}
+ 		
+ 						\addplot[se, dlDetect, visible on = <4->]		table[x = Threads, y = SE]				{./data/update_dl_detect_3a.csv};
+ 						\addplot[delegation, dlDetect, visible on = <4->]	table[x = Threads, y = Delegation]		{./data/update_dl_detect_3a.csv};
+ 						\addplot[dora, dlDetect, visible on = <4->]		table[x = Threads, y = DORA]			{./data/update_dl_detect_3a.csv};
+ 						\addplot[se, noWait, visible on = <12->]		table[x = Threads, y = SE]				{./data/update_no_wait_4a.csv};
+ 						\addplot[delegation, noWait, visible on = <12->]	table[x = Threads, y = Delegation]		{./data/update_no_wait_4a.csv};
+ 						\addplot[dora, noWait, visible on = <12->]		table[x = Threads, y = DORA]			{./data/update_no_wait_4a.csv};
+ 						\addplot[se, 2vNoWait, visible on = <15->]		table[x = Threads, y = 2V_NO_WAIT]	{./data/update_best_architecture_5a.csv};
+ 						\addplot[se, silo, visible on = <19->]			table[x = Threads, y = SE]				{./data/update_silo_4b.csv};
+ 						\addplot[delegation, silo, visible on = <19->]	table[x = Threads, y = Delegation]		{./data/update_silo_4b.csv};
+ 						\addplot[pse, visible on = <21->]			table[x = Threads, y = PSE]			{./data/update_best_architecture_5a.csv};
+ 					\end{axis}
+ 					
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Abort Rate},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+							   ymax = 1.5,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+							   ytick distance = 0.5,
+ 							   axis y line* = right,
+ 							   scale only axis,
+ 							   onslide = <8->{/pgfplots/ticks = {none}},
+							   width = \linewidth,
+ 							   height = .9\textheight,
+							   visible on = <-7>]
+ 						\addplot[se, dlDetect, abortRate, visible on = <2-7>]			table[x = Threads, y = SE]				{./data/update_dl_detect_abort_rate_3b.csv};
+ 						\addplot[delegation, dlDetect, abortRate, visible on = <2-7>]	table[x = Threads, y = Delegation]		{./data/update_dl_detect_abort_rate_3b.csv};
+ 						\addplot[dora, dlDetect, abortRate, visible on = <2-7>]		table[x = Threads, y = DORA]			{./data/update_dl_detect_abort_rate_3b.csv};
+ 					\end{axis}
+ 					
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Abort Rate},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+							   ymax = 20,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+							   yticklabel = {\axisdefaultticklabel\hphantom{$.$}},
+							   extra y tick label = {\hphantom{0.5}},
+ 							   axis y line* = right,
+ 							   scale only axis,
+ 							   onslide = <-7>{/pgfplots/ticks = {none}},
+ 							   width = \linewidth,
+ 							   height = .9\textheight,
+							   visible on = <8->]
+ 						\addplot[se, dlDetect, abortRate, visible on = <8->]			table[x = Threads, y = SE]				{./data/update_dl_detect_abort_rate_3b.csv};
+ 						\addplot[delegation, dlDetect, abortRate, visible on = <8->]	table[x = Threads, y = Delegation]		{./data/update_dl_detect_abort_rate_3b.csv};
+ 						\addplot[dora, dlDetect, abortRate, visible on = <8->]			table[x = Threads, y = DORA]			{./data/update_dl_detect_abort_rate_3b.csv};
+ 						\addplot[se, noWait, abortRate, visible on = <9->]			table[x = Threads, y = SE]				{./data/update_no_wait_abort_rate_4c.csv};
+ 						\addplot[delegation, noWait, abortRate, visible on = <9->]		table[x = Threads, y = Delegation]		{./data/update_no_wait_abort_rate_4c.csv};
+ 						\addplot[dora, noWait, abortRate, visible on = <9->]			table[x = Threads, y = DORA]			{./data/update_no_wait_abort_rate_4c.csv};
+ 						\addplot[se, 2vNoWait, abortRate, visible on = <15->]		table[x = Threads, y = 2V_NO_WAIT]	{./data/update_best_architecture_abort_rate_5b.csv};
+ 						\addplot[se, silo, abortRate, visible on = <17->]				table[x = Threads, y = SILO]			{./data/update_best_architecture_abort_rate_5b.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\vspace{-2em}
+  			\resizebox{\linewidth}{!}{%
+				\begin{tikzpicture}
+					\node[draw, inner ysep = .35em, inner xsep = .25em]	{%
+ 						\begin{tabular}{@{}c@{}}
+ 							\begin{tikzpicture}[inner sep = .1em]
+ 								\matrix[matrix of nodes,
+ 								            anchor = center,
+ 								            ampersand replacement = \&] {
+ 									\ref{plot:se}		\&	SE/NP		\&	\ref{plot:dlDetect}	\&	\lstinline{DL_DETECT}	\\
+ 									\ref{plot:dora}		\&	DORA		\&	\ref{plot:noWait}	\&	\lstinline{NO_WAIT}		\\
+	 								\ref{plot:delegation}	\&	Delegation	\&	\ref{plot:2vNoWait}	\&	\lstinline{2V_NO_WAIT}	\\
+ 									\ref{plot:pse}		\&	PSE			\&	\ref{plot:silo}		\&	\lstinline{SILO}			\\
+	 							};
+ 							\end{tikzpicture}	\\
+	 						\begin{tikzpicture}[inner sep = .1em]
+ 								\matrix[matrix of nodes,
+ 								            anchor = center,
+ 								            ampersand replacement = \&] {
+ 									\ref{plot:abort}	\&	Abort Rate	\\
+ 								};
+ 							\end{tikzpicture}
+ 						\end{tabular}%
+ 					};
+ 				\end{tikzpicture}%
+ 			}%
+			
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-6>{\item	abort rate scales for \ref{label:dlDetect} due to higher contention \bm{$\rightarrow$} deadlocks}
+					\only<5-9>{\item	$\left[\si{\mega\transactions\per\second}\right]$ suffers from aborts and lock thrashing}
+					\only<6-10>{\item	\ref{label:dora}/\ref{label:delegation} suffer more from remote data access overhead}
+					\only<7-10>{\item	latch contention isn't the bottleneck \bm{$\rightarrow$} \ref{label:se} can outperform \ref{label:dora}/\ref{label:delegation}}
+					\only<10-13>{\item	lock thrashing doesn't cause many aborts for \ref{label:noWait} with \ref{label:se} for few threads}
+					\only<11-15>{\item	lock thrashing caused by long commit latencies caused by overloaded (hot) partitions causes many aborts for \ref{label:dora}/\ref{label:delegation}}
+					\only<13-19>{\item	the aborts are the major bottleneck for \ref{label:noWait}}
+					\only<14-19>{\item	latching overhead and deadlocks $\rightarrow$ \ref{label:noWait} outperforms \ref{label:dlDetect} for \ref{label:se}}
+					\only<16-21>{\item	for update-only \ref{label:noWait} and \ref{label:2vNoWait} behave identical}
+					\only<18-22>{\item	\ref{label:silo} causes less aborts than \ref{label:dlDetect} due its optimism}
+					\only<20-22>{\item	long commit latencies of \ref{label:delegation} cause high update contention and therefore many aborts (low $\left[\si{\mega\transactions\per\second}\right]$) for \ref{label:silo}}
+					\only<22->{\item	coarse-grained partition locking of \ref{label:pse} is identical for read and update}
+					\only<23->{\item	\ref{label:pse} scales according to the number of hot records (each transaction locks 2 of 16 (hot) partitions)}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\subsection[Read-Only YCSB Workload]{Read-Only YCSB Workload} \label{subsec:readYCSB}
+
+ \begin{frame}
+	\frametitle{Read-Only YCSB ($\Theta = 0.8$)}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 5,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+							   yticklabel = {\axisdefaultticklabel\hphantom{$.0$}},
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = north west,
+ 							   legend columns = 2,
+ 							   width = \linewidth,
+ 							   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, dlDetect, visible on = <2->]		table[x = Threads, y = DL_DETECT]		{./data/read_only_ycsb_6a.csv};
+ 						\addplot[delegation, dlDetect, visible on = <2->]	table[x = Threads, y = DELEGATION]	{./data/read_only_ycsb_6a.csv};
+ 						\addplot[se, noWait, visible on = <5->]		table[x = Threads, y = NO_WAIT]		{./data/read_only_ycsb_6a.csv};
+ 						\addplot[se, 2vNoWait, visible on = <5->]		table[x = Threads, y = 2V_NO_WAIT]	{./data/read_only_ycsb_6a.csv};
+ 						\addplot[se, silo, visible on = <8->]			table[x = Threads, y = SILO]			{./data/read_only_ycsb_6a.csv};
+ 						\addplot[pse, visible on = <10->]			table[x = Threads , y = PSE]			{./data/read_only_ycsb_6a.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-8>{\item	\ref{label:se} scales well with \ref{label:dlDetect} until the latch contention becomes a bottleneck}
+					\only<4-10>{\item	\ref{label:delegation} (and \ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+					\only<6->{\item	atomics of \ref{label:noWait} scale better than latches of \ref{label:dlDetect}}
+					\only<7->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for read-only}
+					\only<9->{\item	\ref{label:silo} lags behind \ref{label:2vNoWait} due to the overhead of copying read (large) records for validation}
+					\only<11->{\item	coarse-grained partition locking of \ref{label:pse} is identical for read and update}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\subsection[Update-Only YCSB Workload]{Update-Only YCSB Workload} \label{subsec:updateYCSB}
+
+ \begin{frame}
+	\frametitle{Update-Only YCSB ($\Theta = 0.8$)}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {Number of Threads},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 1.5,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = north west,
+ 							   legend columns = 2,
+ 							   width = \linewidth,
+ 							   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, dlDetect, visible on = <2->]		table[x = Threads, y = DL_DETECT]		{./data/update_only_ycsb_6b.csv};
+ 						\addplot[se, noWait, visible on = <4->]		table[x = Threads, y = NO_WAIT]		{./data/update_only_ycsb_6b.csv};
+ 						\addplot[se, 2vNoWait, visible on = <4->]		table[x = Threads, y = 2V_NO_WAIT]	{./data/update_only_ycsb_6b.csv};
+ 						\addplot[se, silo, visible on = <7->]			table[x = Threads, y = SILO]			{./data/update_only_ycsb_6b.csv};
+ 						\addplot[pse, visible on = <9->]				table[x = Threads , y = PSE]			{./data/update_only_ycsb_6b.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-9>{\item	\ref{label:dlDetect} suffers from deadlocks for many threads}
+					\only<5->{\item	lock thrashing (aborts for \ref{label:noWait}) isn't a bottleneck due to lower contention}
+					\only<6->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for update-only}
+					\only<8->{\item	\ref{label:silo} causes less aborts than \ref{label:noWait} due its optimism $\rightarrow$ higher $\left[\si{\mega\transactions\per\second}\right]$}
+					\only<10->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Update-Only YCSB (72 Threads)}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {$\Theta$},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 1,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 2.75,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = south west,
+ 							   legend columns = 2,
+ 							   legend style = {yshift = 1em},
+ 		 					   width = \linewidth,
+ 		 					   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, dlDetect, visible on = <2->]		table[x = Theta, y = DL_DETECT]	{./data/update_only_ycsb_contention_6c.csv};
+ 						\addplot[se, noWait, visible on = <2->]		table[x = Theta, y = NO_WAIT]		{./data/update_only_ycsb_contention_6c.csv};
+ 						\addplot[se, 2vNoWait, visible on = <2->]		table[x = Theta, y = 2V_NO_WAIT]	{./data/update_only_ycsb_contention_6c.csv};
+ 						\addplot[se, silo, visible on = <2->]			table[x = Theta, y = SILO]			{./data/update_only_ycsb_contention_6c.csv};
+ 						\addplot[pse, visible on = <7->]				table[x = Theta , y = PSE]			{./data/update_only_ycsb_contention_6c.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-7>{\item	for $\Theta\leq0.4$ the contention is very low $\bm{\rightarrow}$ high concurrency possible}
+					\only<4->{\item	copying records imposes an overhead to \ref{label:2vNoWait}/\ref{label:silo}}
+					\only<5->{\item	atomics of \ref{label:noWait} scale better than latches of \ref{label:dlDetect}}
+					\only<6->{\item	\ref{label:silo} causes less aborts than \ref{label:noWait} due its optimism $\rightarrow$ higher $\left[\si{\mega\transactions\per\second}\right]$}
+					\only<8->{\item	\ref{label:pse} doesn't scale well due to partition-unfriendly zipfian access distribution}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\subsection[Mixed YCSB Workload]{Mixed YCSB Workload} \label{subsec:mixedYCSB}
+
+ \begin{frame}
+	\frametitle{Mixed YCSB ($\Theta = 0.8$, 72 Threads)}
+
+	\hspace{-2em}%
+	\begin{columns}[T]
+		\begin{column}{.667\enhancedtextwidth}
+			\centering
+ 			\resizebox{\linewidth}{!}{%
+ 				\begin{tikzpicture}
+ 					\begin{axis}[xlabel = {Number of Writers},
+ 							   xlabel near ticks,
+ 							   xmin = 0,
+ 							   xmax = 72,
+ 							   xmode = normal,
+ 							   scaled x ticks = false,
+ 							   ylabel = {Transaction Throughput $\left[\si{\mega\transactions\per\second}\right]$},
+ 							   ylabel near ticks,
+ 							   ymin = 0,
+ 							   ymax = 5,
+ 							   ymode = normal,
+ 							   scaled y ticks = false,
+							   yticklabel = {\axisdefaultticklabel\hphantom{$.0$}},
+ 							   grid = major,
+ 							   scale only axis,
+ 							   legend pos = north east,
+ 							   legend columns = 2,
+ 		 					   width = \linewidth,
+ 		 					   height = .8\textheight]
+ 						\addlegendimage{se, legendArchitecture}
+ 						\addlegendentry{SE/NP}
+ 						\addlegendimage{dlDetect, legendCC}
+ 						\addlegendentry{\lstinline{DL_DETECT}}
+ 						\addlegendimage{dora, legendArchitecture}
+ 						\addlegendentry{DORA}
+ 						\addlegendimage{noWait, legendCC}
+ 						\addlegendentry{\lstinline{NO_WAIT}}
+ 						\addlegendimage{delegation, legendArchitecture}
+ 						\addlegendentry{Delegation}
+ 						\addlegendimage{2vNoWait, legendCC}
+ 						\addlegendentry{\lstinline{2V_NO_WAIT}}
+ 						\addlegendimage{pse}
+ 						\addlegendentry{PSE}
+ 						\addlegendimage{silo, legendCC}
+ 						\addlegendentry{\lstinline{SILO}}
+ 		
+ 						\addplot[se, dlDetect, visible on = <2->]		table[x = Writers, y = DL_DETECT]	{./data/mixed_ycsb_writers_6d.csv};
+ 						\addplot[se, noWait, visible on = <5->]		table[x = Writers, y = NO_WAIT]	{./data/mixed_ycsb_writers_6d.csv};
+ 						\addplot[se, 2vNoWait, visible on = <5->]		table[x = Writers, y = 2V_NO_WAIT]	{./data/mixed_ycsb_writers_6d.csv};
+ 						\addplot[se, silo, visible on = <8->]			table[x = Writers, y = SILO]		{./data/mixed_ycsb_writers_6d.csv};
+ 						\addplot[pse, visible on = <11->]				table[x = Writers , y = PSE]		{./data/mixed_ycsb_writers_6d.csv};
+ 					\end{axis}
+ 				\end{tikzpicture}%
+ 			}%
+		\end{column}
+		\begin{column}{.333\enhancedtextwidth}
+			\footnotesize
+			\begin{block}{Observations}
+				\only<3->{\begin{itemize}
+					\only<3-8>{\item	\ref{label:dlDetect} suffers from latch contention for 72 reading threads}
+					\only<4-9>{\item	\ref{label:dlDetect} suffers from deadlocks for writing threads}
+					\only<6-11>{\item	atomics of \ref{label:noWait} scale better than latches of \ref{label:dlDetect}}
+					\only<7-11>{\item	multi-versioning of \ref{label:2vNoWait} improves concurrency for mixed workloads}
+					\only<9->{\item	\ref{label:silo} lags behind \ref{label:2vNoWait} due to the overhead of copying read (large) records for validation}
+					\only<10->{\item	\ref{label:silo} causes less aborts than \ref{label:2vNoWait} due its optimism for many writers}
+					\only<12->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+				\end{itemize}}
+			\end{block}
+		\end{column}
+	\end{columns}
+\end{frame}
+
+\subsection[Conclusion]{Conclusion} \label{subsec:conclusion}
+
+ \begin{frame}
+	\frametitle{Conclusion I}
+
+	\begin{itemize}
+		\visible<2->{\item	optimistic CC scales better than pessimistic CC for most workloads}
+		\visible<3->{\item	optimistic CC suffers from large record sizes}
+		\visible<4->{\item	atomic operations scale better than latches}
+		\visible<5->{\item	partitioning make latches scalable}
+		\visible<6->{\item	2PL doesn't scale for mixed workloads}
+		\visible<7->{\item	partitioning DB architectures perform bad under partition-unfriendly workloads}
+		\visible<8->{\item	partitioning DB architectures perform bad under multi-sited transactions}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Conclusion II}
+
+	\begin{itemize}
+		\visible<2->{\item	the transaction throughput decreases by an order of magnitude for update-only instead of read-only workloads (PSE is insensitive to writes) \bm{$\rightarrow$} PSE scales best for update-intensive workloads}
+		\visible<3->{\item	PSE doesn't scale for read-intensive high contention workloads wth small hot sets}
+		\visible<4->{\item[$\rightarrow$]	None of the architectures or CC protocols outperform the others for any workload!}
+		\visible<5->{\item[$\rightarrow$]	Every architecture and CC protocol performs very bad for some specific workload!}
+	\end{itemize}
+\end{frame}
+
+\subsection[Discussion]{Discussion} \label{subsec:discussion}
+
+ \begin{frame}
+	\frametitle{Discussion of the Performance Evaluation}
+
+	\begin{itemize}
+		\visible<2->{\item	read-only and update-only workload aren't appropriate to evaluate concurrency control algorithms}
+		\visible<3->{\item	partition-unfriendly workloads aren't appropriate to evaluate database architectures that use partitioning}
+		\visible<4->{\item	neither the microbenchmark nor YCSB are OLTP benchmarks}
+		\visible<5->{\item[$\rightarrow$]	The authors didn't properly analyze the combination of database architecture and concurrency control algorithm for OLTP workloads!}
+	\end{itemize}
+\end{frame}

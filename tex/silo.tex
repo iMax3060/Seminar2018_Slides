@@ -1,0 +1,26 @@
+\newcommand{\siloDiagram}[1][1.0]{%
+	\tikzset{
+		phase/.style = {draw = beamer@blendedblue,
+				        text = beamer@blendedblue,
+				        text width = 4em,
+				        align = center,
+				        thick,
+				        shape = ellipse,
+				        inner sep = 1pt},
+		transision/.style = { -stealth ,
+					     draw = beamer@blendedblue,
+					     fill = beamer@blendedblue,
+					     thick}
+	}	
+
+	\begin{tikzpicture}[opacity = #1,
+	                             baseline = (current bounding box.center),
+	                             node distance = 1em]
+		\node[phase]					(p1)			{read phase};
+		\node[phase, below = of p1]		(p2)			{validation phase};
+		\node[phase, below = of p2]		(p3)			{write phase};
+		
+		\draw[transision]		(p1)		edge					(p2);
+		\draw[transision]		(p2)		edge					(p3);
+	\end{tikzpicture}%
+}

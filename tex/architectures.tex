@@ -1,0 +1,795 @@
+\section[DB Architectures]{Database Architectures} \label{sec:architectures}
+
+ \begin{frame}
+	\sectionpage
+	
+	\centering
+	\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+		Shared Everything/ Non-Partitioned	&	\seDiagram		&	\doraDiagram	&	Data-Oriented Transaction Execution (DORA)	\\
+		Delegation					&	\delegationDiagram	&	\pseDiagram	&	Partitioned Serial Execution (PSE)
+	\end{tabular}
+\end{frame}
+
+\subsection[Shared Everything/\-Non-Partitioned]{Shared Everything/\-Non-Partitioned (SE/NP)}
+
+ \begin{frame}
+	\subsectionpage
+	
+	\centering
+	\only<1>{%
+		\resizebox{!}{\architecturesheight}{%
+			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+				Shared Everything/ Non-Partitioned	&	\seDiagram			&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+				\textcolor{black!50}{Delegation}		&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+			\end{tabular}%
+		}%
+	}%
+	\only<2>{%
+		\resizebox{!}{.97\architecturesheight}{%
+			\seDiagram%
+		}%
+	}%
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Properties of SE/NP}
+	
+	\begin{itemize}
+		\visible<2->{\item	metadata (incl. locks) aren't partitioned}
+		\visible<3->{\item[$\rightarrow$]	physical synchronization (latches, atomic instructions) required}
+		\visible<4->{\item	data and indices aren't partitioned}
+		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol also required}
+		\visible<6->{\item	transactions completely executed by one thread}
+		\visible<6->{\item	thread-assignment depends only on load}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}[fragile]
+	\frametitle{Pros \& Cons of SE/NP}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	no partitioning required (e.g. manual selection of a partitioning strategy)}
+		\visible<3->{\item[$+$]	partitioning would be sensitive to the workload}
+		\visible<4->{\item[$+$]	changed workloads would require (probably expensive) repartitioning to benefit from partitioning}
+		\visible<5->{\item[$-$]	each thread might access every record at arbitrary times}
+			\begin{itemize}
+				\visible<17->{\item[$-$]	each CPU cache may contain any part of the data \bm{$\rightarrow$} cache pollution}
+				\visible<19->{\item[$-$]	each CPU may access any part of the data \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<21->{\item[$-$]	each CPU may acquire any latch \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<22->{\item[$-$]	each CPU may atomically write to any semaphore \bm{$\rightarrow$} hardware cache coherence overhead}
+			\end{itemize}
+	\end{itemize}
+    
+	\tikzset{%
+		changes/.style = { -> , very thick, > = stealth},
+		volatile/.style = {fill = red!50},
+		nonvolatile/.style = {fill = green!50},
+		changes/.append style = {color = red}
+	}
+
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[visible on = <6-16>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+			\begin{adjustbox}{width = \enhancedtextwidth}%
+				\begin{tikzpicture}
+					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
+							  xlabel near ticks,
+							  xmin = 0,
+							  xmax = 0.9,
+							  xtick distance = {0.1},
+							  scaled x ticks = false,
+							  minor x tick num = 9,
+							  ylabel = {TPC-C district},
+							  ylabel near ticks,
+							  ymin = 0,
+							  ymax = 100,
+							  ymode = normal,
+							  scaled y ticks = false,
+							  legend entries = {{Thread 0}, {Thread 1}, {Thread 2}, {Thread 3}, {Thread 4}, {Thread 5}, {Thread 6}, {Thread 7}, {Thread 8}, {Thread 9}},
+							  legend style = {font = \footnotesize},
+							  legend pos = outer north east,
+							  width = \linewidth,
+							  height = .95\textheight,
+							  axis on top = true,
+							  title = {Record Accesses of Conventional DB Threads (\cite{Pandis:2010})}]		
+						\addplot[visible on = <7->, only marks, mark = x, draw = black] table {data/record_accesses_per_thread_conventional_0.csv};
+						\addplot[visible on = <8->, only marks, mark = x, draw = cyan] table {data/record_accesses_per_thread_conventional_1.csv};
+						\addplot[visible on = <9->, only marks, mark = x, draw = red] table {data/record_accesses_per_thread_conventional_2.csv};
+						\addplot[visible on = <10->, only marks, mark = x, draw = green] table {data/record_accesses_per_thread_conventional_3.csv};
+						\addplot[visible on = <11->, only marks, mark = x, draw = blue] table {data/record_accesses_per_thread_conventional_4.csv};
+						\addplot[visible on = <12->, only marks, mark = x, draw = black!50] table {data/record_accesses_per_thread_conventional_5.csv};
+						\addplot[visible on = <13->, only marks, mark = x, draw = cyan!50] table {data/record_accesses_per_thread_conventional_6.csv};
+						\addplot[visible on = <14->, only marks, mark = x, draw = red!50] table {data/record_accesses_per_thread_conventional_7.csv};
+						\addplot[visible on = <15->, only marks, mark = x, draw = green!50] table {data/record_accesses_per_thread_conventional_8.csv};
+						\addplot[visible on = <16->, only marks, mark = x, draw = blue!50] table {data/record_accesses_per_thread_conventional_9.csv};
+					\end{axis}
+				\end{tikzpicture}%
+			\end{adjustbox}%
+    												   };
+		\node[visible on = <18>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+			\begin{adjustbox}{width = \textwidth + 4.0em}
+				\begin{tikzpicture}[]
+							% Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
+							\node[]			(0)															{};
+							\node[]			(1)		[below = 1.2*1.5cm of 0.center, anchor = center]					{};
+							\node[]			(2a)		[below = 1.2*(1/3)*1.25cm of 1.center, anchor = center]				{};
+							\node[]			(2b)		[below = 1.2*(1/3)*1.25cm of 2a.center, anchor = center]				{};
+							\node[]			(2c)		[below = 1.2*(1/3)*1.25cm of 2b.center, anchor = center]				{};
+							\node[]			(3)		[below = 1.2*0.75cm of 2c.center, anchor = center]					{};
+							\node[]			(4)		[below = 1.2*0.75cm of 3.center, anchor = center]					{};
+							\node[]			(5)		[below = 1.2*0.75cm of 4.center, anchor = center]					{};
+							\node[]			(6)		[below = 1.2*0.75cm of 5.center, anchor = center]					{};
+	
+							% Anchor points of the pyramid (n0: Left anchor point; n1: Right anchor point):
+							\node[]			(10)		[left = (2/3)*1.5cm of 1.center, anchor = center]					{};
+							\node[]			(11)		[right = (2/3)*1.5cm of 1.center, anchor = center]				{};
+							\node[]			(2a0)		[left = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]	{};
+							\node[]			(2a1)		[right = (2/3)*(1.5cm+(1/3)*1.25cm) of 2a.center, anchor = center]	{};
+							\node[]			(2b0)		[left = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]	{};
+							\node[]			(2b1)		[right = (2/3)*(1.5cm+(2/3)*1.25cm) of 2b.center, anchor = center]	{};
+							\node[]			(2c0)		[left = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]	{};
+							\node[]			(2c1)		[right = (2/3)*(1.5cm+(3/3)*1.25cm) of 2c.center, anchor = center]	{};
+							\node[]			(30)		[left = (2/3)*3.5cm of 3.center, anchor = center]					{};
+							\node[]			(31)		[right = (2/3)*3.5cm of 3.center, anchor = center]				{};
+							\node[]			(40)		[left = (2/3)*4.25cm of 4.center, anchor = center]				{};
+							\node[]			(41)		[right = (2/3)*4.25cm of 4.center, anchor = center]				{};
+							\node[]			(50)		[left = (2/3)*5cm of 5.center, anchor = center]					{};
+							\node[]			(51)		[right = (2/3)*5cm of 5.center, anchor = center]					{};
+							\node[]			(60)		[left = (2/3)*5.75cm of 6.center, anchor = center]				{};
+							\node[]			(61)		[right = (2/3)*5.75cm of 6.center, anchor = center]				{};
+			
+							% "Center" of the pyramid (shifted towards top) used for the designation of performance measures:
+							\node[]			(cen)		[below = 2.5cm of 0.center]								{};
+			
+							% Designation of performance measures:
+							\node[rotate = 61]	(cpu)		[left = 3.25cm of cen.center, anchor = center]				{\footnotesize \textit{\textbf{Capacity per CPU}}};
+							\node[rotate = -61]	(acc)		[right = 4.25cm of cen.center, anchor = center]				{\footnotesize \textit{\textbf{Access Time}}};
+			
+							% Fills the pyramid to mark volatile and non-volatile layers:
+							\fill[volatile]
+								(0.center) -- (30.center) -- (31.center) -- cycle;
+							\fill[nonvolatile]
+								(30.center) -- (31.center) -- (61.center) -- (60.center) -- cycle;
+			
+							% Key the markings for volatile and non-volatile layers
+							\node[draw, volatile]		(red)		[left = 4cm of 0.center, anchor = north]		{};
+							\node[]					(legred)	[right = 0cm of red.east, anchor = west]		{\footnotesize Volatile};
+							\node[draw, nonvolatile]		(green)	[below = 0.2cm of red.south, anchor = north]	{};
+							\node[]					(leggreen)	[right = 0cm of green.east, anchor = west]		{\footnotesize Non-volatile};
+	
+							% Storage layer names:
+							\node[]	(reg)		[above = 0cm of 1.center, anchor = south]		{\footnotesize Registers};
+							\node[]	(l1)		[above = 0cm of 2a.center, anchor = south]	{\footnotesize L1 Cache};
+							\node[]	(l2)		[above = 0cm of 2b.center, anchor = south]	{\footnotesize L2 Cache};
+							\node[]	(l3)		[above = 0cm of 2c.center, anchor = south]	{\footnotesize L3 Cache};
+							\node[]	(mem)	[above = 0.05cm of 3.center, anchor = south]	{\small Main Memory};
+							\node[]	(ssd)		[above = 0.05cm of 4.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - SDD}};
+							\node[]	(mas)	[above = 0.05cm of 5.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - HDD}};
+							\node[]	(mem)	[above = 0.05cm of 6.center, anchor = south]	{\small Offline Storage \scriptsize \textit{(Tertiary Storage)}};
+	
+							% Anchor points for the brace used to mark the example data from Intel Xeon:
+							\node[]	(0h)		[right = 2.75cm of 0]		{};
+							\node[]	(31h)		[right = 2.75cm of 31]	{};
+			
+							% Draw the pyramid:
+							\path[ - , thick]
+								(0.center)			edge	[]	(10.center)
+								(0.center)			edge[]	(11.center)
+								(10.center)		edge[]	(11.center)
+								(10.center)		edge	[]	(2a0.center)
+								(11.center)		edge	[]	(2a1.center)
+								(2a0.center)		edge	[]	(2a1.center)
+								(2a0.center)		edge	[]	(2b0.center)
+								(2a1.center)		edge[]	(2b1.center)
+								(2b0.center)		edge[]	(2b1.center)
+								(2b0.center)		edge[]	(2c0.center)
+								(2b1.center)		edge[]	(2c1.center)
+								(2c0.center)		edge[]	(2c1.center)
+								(2c0.center)		edge[]	(30.center)
+								(2c1.center)		edge[]	(31.center)
+								(30.center)		edge[]	(31.center)
+								(30.center)		edge[]	(40.center)
+								(31.center)		edge	[]	(41.center)
+								(40.center)		edge	[]	(41.center)
+								(40.center)		edge[]	(50.center)
+								(41.center)		edge	[]	(51.center)
+								(50.center)		edge	[]	(51.center)
+								(50.center)		edge	[]	(60.center)
+								(51.center)		edge[]	(61.center)
+								(60.center)		edge	[]	(61.center);
+			
+							% Draw the connections between the brace used to mark the example data from Intel Xeon and the appropriate pyramid layers:
+							\path[dotted]
+								(0.center)				edge		(0h.center)
+								(31.center)			edge		(31h.center);
+				
+							% Add the capacities:
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(0.center) -- (10.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{128}{\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(10.center) -- (2a0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{256}{\kibi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(2a0.center) -- (2b0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{1}{\mebi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(2b0.center) -- (2c0.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\small \SI{8}{\mebi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(2c0.center) -- (30.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\SI{64}{\gibi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(30.center) -- (40.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(40.center) -- (50.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\tebi\byte}--\si{\pebi\byte}};
+							\draw [decorate, decoration = {brace, mirror, amplitude = 3.75pt}]
+								(50.center) -- (60.center) node[black, midway, xshift = -0.1cm, yshift = 0.1cm, anchor = east] {\si{\pebi\byte}};
+	
+							% Add the access times:
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(0.center) -- (11.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{1}{\cy} $\approx$ \SI{0.25}{\nano\second}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(11.center) -- (2a1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{4}{\cy} $\approx$ \SI{1}{\nano\second}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(2a1.center) -- (2b1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{12}{\cy} $\approx$ \SI{3}{\nano\second}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(2b1.center) -- (2c1.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\small \SI{42}{\cy} $\approx$ \SI{11}{\nano\second}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(2c1.center) -- (31.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{51}{\nano\second}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(31.center) -- (41.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\SI{\approx 0.1}{\milli\second} \tiny \cite{samsung:ssdprimer}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \cite{EntHDD} \cite{HDD2016}};
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$s - min$};
+	
+							% Mark the source of the performance data of the volatile layers:
+							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
+								(0h.center) -- (31h.center) node[black, midway, xshift = -0.625cm, yshift = 0.1cm, anchor = west] {\footnotesize \begin{tabular}{r}\textit{\textbf{Example System:}}\\\textit{Intel\textsuperscript{\tiny\textregistered} Xeon\textsuperscript{\tiny\textregistered}}\\\textit{E3-1280 v5}\\\textit{(Skylake)}\\\cite{7cpu:skylake}\end{tabular}};
+				
+							% Orientation of changes of performance data:
+							\path[changes]
+								([xshift = (-1/3)*4cm+0.25cm]60.center)			edge		node[above, rotate = 90]		{\footnotesize Price per Capacity}	([xshift = (-1/3)*14cm-0.25cm]0.center)
+								([xshift = (1/3)*18cm+0.5cm]0.center)			edge		node[above, rotate = -90]		{\footnotesize Access Time}		([xshift = (1/3)*8cm]61.center);
+				\end{tikzpicture}
+			\end{adjustbox}
+    												   };
+		\node[visible on = <20>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+			\begin{adjustbox}{width = \enhancedtextwidth}%
+				\begin{tikzpicture}
+					\begin{axis}[major x tick style = transparent,
+							   ybar = 2*\pgflinewidth,
+							   bar width = 14pt,
+							   ymajorgrids = true,
+							   ylabel = {Message Throughput $\left[\si{\kilo\messages\per\second}\right]$},
+							   symbolic x coords = {{FIFO}, {POSIX Message Queues}, {Pipes}, {TCP Sockets}, {UNIX Sockets}},
+							   xtick = data,
+							   x tick label style = {text width = width("Message"),
+											align = center},
+							   scaled y ticks = false,
+							   enlarge x limits = 0.1,
+							   ymin = 0,
+							   legend style = {at = {(.5, 1.09)},
+										  anchor = north},
+							   width = \linewidth,
+							   height = .7\textheight,
+							   title= {Throughput of Inter-Process Communication Mechanisms (\cite{Porobic:2012})}]
+						\addplot[style = {blue, fill = blue, mark = none}]	coordinates {({FIFO}, 58.9078) ({POSIX Message Queues}, 61.5127) ({Pipes}, 59.832) ({TCP Sockets}, 21.2451) ({UNIX Sockets}, 66.8908)};
+						\addplot[style = {red, fill = red, mark = none}]	coordinates {({FIFO}, 41.5969) ({POSIX Message Queues}, 42.6893) ({Pipes}, 40.0843) ({TCP Sockets}, 16.6391) ({UNIX Sockets}, 44.454)};
+
+						\legend{{Local NUMA region}, {Remote NUMA region}}
+					\end{axis}
+				\end{tikzpicture}%
+			\end{adjustbox}%
+    												   };
+	\end{tikzpicture}
+\end{frame}
+
+\subsection[DORA]{Data-Oriented Transaction Execution (DORA)}
+
+ \begin{frame}
+	\subsectionpage
+	
+	\centering
+	\only<1>{%
+		\resizebox{!}{\architecturesheight}{%
+			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram		&	Data-Oriented Transaction Execution (DORA)			\\
+				\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+			\end{tabular}%
+		}%
+	}%
+	\only<2>{%
+		\resizebox{!}{.97\architecturesheight}{%
+			\doraDiagram%
+		}%
+	}%
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Properties of DORA}
+	
+	\begin{itemize}
+		\visible<2->{\item	metadata (incl. locks) are physically partitioned}
+		\visible<3->{\item[$\rightarrow$]	no physical synchronization (latches, atomics) required}
+		\visible<4->{\item	data and indices are logically partitioned}
+		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required}
+		\visible<6->{\item	threads are assigned to data}
+		\visible<6->{\item	transactions migrate to threads owning the accessed data}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}[fragile]
+	\frametitle{Example}
+	
+	\tikzset{
+		fiber/.style = {shape = rectangle},
+		thread/.style = {shape = rectangle,
+					anchor = north west},
+		record/.style = {shape = rectangle,
+					draw = black,
+					anchor = west,
+					scale = 2}
+	}
+	
+	\begin{adjustbox}{width = \linewidth}
+		\begin{tikzpicture}
+			\node[fiber, visible on = <2-26>]							(f0)	{%
+				\begin{tabular}{| r | l |}
+					\multicolumn{2}{c}{\textbf{Fiber 0}}															\\	\hline
+					\only<-3>{\textbf{Locks:}		&															\\	\hline}%
+					\only<4-7>{\textbf{Locks:}		&	$\left(5, S\right)$											\\	\hline}%
+					\only<8>{\textbf{Locks:}		&	$\left(5, S\right), \left(3, S\right)$								\\	\hline}%
+					\only<9-14>{\textbf{Locks:}	&	$\left(5, S\right), \left(3, S\right), \left(2, X\right)$					\\	\hline}%
+					\only<15>{\textbf{Locks:}		&	$\left(5, S\right), \left(3, S\right), \left(2, X\right),$					\\%
+											&	$\left(0, S\right)$											\\	\hline}%
+					\only<16>{\textbf{Locks:}		&	$\left(5, S\right), \left(3, S\right), \left(2, X\right),$					\\%
+											&	$\left(0, S\right), \left(1, S\right)$								\\	\hline}%
+					\only<17-20>{\textbf{Locks:}	&	$\left(5, S\right), \left(3, S\right), \left(2, X\right)$					\\	\hline}%
+					\only<21-24>{\textbf{Locks:}	&	$\left(5, S\right)$											\\	\hline}%
+					\only<25->{\textbf{Locks:}		&															\\	\hline}%
+					\textbf{Code:}				&	\only<4->{\color{green}}\ttfamily BOT								\\
+											&	\only<5->{\color{green}}\ttfamily \quad read(5);\visible<4>{ <-}			\\
+											&	\only<9->{\color{green}}\ttfamily \quad read(3);\visible<8>{ <-}			\\
+											&	\only<10->{\color{green}}\ttfamily \quad write(2, x);\visible<9>{ <-}		\\
+											&	\only<16->{\color{green}}\ttfamily \quad read(1);\visible<15>{ <-}		\\
+											&	\only<26->{\color{green}}\ttfamily \quad commit();\visible<16-25>{ <-}	\\
+											&	\only<26->{\color{green}}\ttfamily EOT							\\	\hline
+					\textbf{Locks:}				&															\\	\hline
+				\end{tabular}%
+																};
+			\node[fiber, below = 17.5em of f0.north, visible on = <9-14>]	(f1)	{%
+				\begin{tabular}{| r | l |}
+					\multicolumn{2}{c}{\textbf{Fiber 1}}													\\	\hline
+					\only<-10>{\textbf{Locks:}	&														\\	\hline}%
+					\only<11>{\textbf{Locks:}	&	$\left(0, S\right)$										\\	\hline}%
+					\only<12>{\textbf{Locks:}	&	$\left(0, S\right), \left(1, S\right)$							\\	\hline}%
+					\only<13->{\textbf{Locks:}	&														\\	\hline}%
+					\textbf{Code:}			&	\only<11->{\color{green}}\ttfamily BOT						\\
+										&	\only<12->{\color{green}}\ttfamily \quad read(0);\visible<11>{ <-}	\\
+										&	\only<13->{\color{green}}\ttfamily \quad read(1);\visible<12>{ <-}	\\
+										&	\only<14->{\color{green}}\ttfamily \quad commit();\visible<13>{ <-}	\\
+										&	\only<14->{\color{green}}\ttfamily EOT						\\	\hline
+				\end{tabular}%
+																};
+
+			\node[above right = 8em and 4em of f0.north east, thread]	(t0)	{%
+				\begin{tabular}{| r | p{\fiberwidth} |}
+					\multicolumn{2}{c}{\textbf{Thread 0}}									\\	\hline
+					\only<-8>{\textbf{Fibers:}		&	\textit{idle}							\\	\hline}%
+					\only<9>{\textbf{Fibers:}		&	Fiber 1 \textit{created}				\\	\hline}%
+					\only<10>{\textbf{Fibers:}		&	Fiber 1 \textit{waiting}				\\	\hline}%
+					\only<11>{\textbf{Fibers:}		&	Fiber 1 \textit{running}				\\%
+											&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<12>{\textbf{Fibers:}		&	Fiber 1 \textit{running}				\\%
+											&	Fiber 0 \textit{waiting}				\\	\hline}%
+					\only<13>{\textbf{Fibers:}		&	Fiber 1 \textit{committing}				\\%
+											&	Fiber 0 \textit{waiting}				\\	\hline}%
+					\only<14>{\textbf{Fibers:}		&	Fiber 1 \textit{terminated}				\\%
+											&	Fiber 0 \textit{waiting}				\\	\hline}%
+					\only<15-16>{\textbf{Fibers:}	&	Fiber 0 \textit{running}				\\	\hline}%
+					\only<17>{\textbf{Fibers:}		&	Fiber 0 \textit{committing}				\\	\hline}%
+					\only<18>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<19->{\textbf{Fibers:}		&	\textit{idle}							\\	\hline}%
+					\only<-10>{\textbf{Locks:}		&									\\	\hline}%
+					\only<11>{\textbf{Locks:}		&	$\left(0, S\right)_1$					\\	\hline}%
+					\only<12>{\textbf{Locks:}		&	$\left(0, S\right)_1, \left(1, S\right)_1$	\\	\hline}%
+					\only<13-14>{\textbf{Locks:}	&									\\	\hline}%
+					\only<15>{\textbf{Locks:}		&	$\left(0, S\right)_0$					\\	\hline}%
+					\only<16>{\textbf{Locks:}		&	$\left(0, S\right)_0, \left(1, S\right)_0$	\\	\hline}%
+					\only<17->{\textbf{Locks:}		&									\\	\hline}%
+					\textbf{Partition:}			&	$0-1, ...$							\\	\hline
+					
+				\end{tabular}%
+										};
+			\node[right = 1em of t0.north east, thread]	(t1)	{%
+				\begin{tabular}{| r | p{\fiberwidth} |}
+					\multicolumn{2}{c}{\textbf{Thread 1}}									\\	\hline
+					\only<-5>{\textbf{Fibers:}		&	\textit{idle}							\\	\hline}%
+					\only<6>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<7>{\textbf{Fibers:}		&	Fiber 0 \textit{waiting}				\\	\hline}%
+					\only<8-9>{\textbf{Fibers:}		&	Fiber 0 \textit{running}				\\	\hline}%
+					\only<10>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<11-18>{\textbf{Fibers:}	&	\textit{idle}							\\	\hline}%
+					\only<19>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<20>{\textbf{Fibers:}		&	Fiber 0 \textit{waiting}				\\	\hline}%
+					\only<21>{\textbf{Fibers:}		&	Fiber 0 \textit{committing}				\\	\hline}%
+					\only<22>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}				\\	\hline}%
+					\only<23->{\textbf{Fibers:}		&	\textit{idle}							\\	\hline}%
+					\only<-7>{\textbf{Locks:}		&									\\	\hline}%
+					\only<8>{\textbf{Locks:}		&	$\left(3, S\right)_0$					\\	\hline}%
+					\only<9-20>{\textbf{Locks:}	&	$\left(3, S\right)_0, \left(2, X\right)_0$	\\	\hline}%
+					\only<21->{\textbf{Locks:}		&									\\	\hline}%
+					\textbf{Partition:}			&	$2-3, ...$							\\	\hline
+					
+				\end{tabular}%
+										};
+			\node[right = 1em of t1.north east, thread]	(t2)	{%
+				\begin{tabular}{| r | p{\fiberwidth} |}
+					\multicolumn{2}{c}{\textbf{Thread 2}}						\\	\hline
+					\only<-1>{\textbf{Fibers:}		&	\textit{idle}				\\	\hline}%
+					\only<2>{\textbf{Fibers:}		&	Fiber 0 \textit{created}	\\	\hline}%
+					\only<3>{\textbf{Fibers:}		&	Fiber 0 \textit{waiting}	\\	\hline}%
+					\only<4>{\textbf{Fibers:}		&	Fiber 0 \textit{running}	\\	\hline}%
+					\only<5>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}	\\	\hline}%
+					\only<6-22>{\textbf{Fibers:}	&	\textit{idle}				\\	\hline}%
+					\only<23>{\textbf{Fibers:}		&	Fiber 0 \textit{suspended}	\\	\hline}%
+					\only<24>{\textbf{Fibers:}		&	Fiber 0 \textit{waiting}	\\	\hline}%
+					\only<25>{\textbf{Fibers:}		&	Fiber 0 \textit{committing}	\\	\hline}%
+					\only<26>{\textbf{Fibers:}		&	Fiber 0 \textit{terminated}	\\	\hline}%
+					\only<27->{\textbf{Fibers:}		&	\textit{idle}				\\	\hline}%
+					\only<-3>{\textbf{Locks:}		&						\\	\hline}%
+					\only<4-24>{\textbf{Locks:}	&	$\left(5, S\right)_0$		\\	\hline}%
+					\only<25->{\textbf{Locks:}		&						\\	\hline}%
+					\textbf{Partition:}			&	$4-5, ...$				\\	\hline
+					
+				\end{tabular}%
+										};
+			
+			\node[right = 20em of f1, record]	(r0)		{0};
+			\node[right = 0em of r0.east, record]	(r1)		{1};
+			\node[right = 0em of r1.east, record]	(r2)		{2};
+			\node[right = 0em of r2.east, record]	(r3)		{3};
+			\node[right = 0em of r3.east, record]	(r4)		{4};
+			\node[right = 0em of r4.east, record]	(r5)		{5};
+			\node[below = 1em of r2.south east, scale = 2]	{...};
+			
+			\draw[ -> , visible on = <2>]		(f0)		edge[bend right = 15]	node[below]		{create \textbf{Fiber 0}}	(t2);
+			\draw[ -> , visible on = <4>]		(t2)		edge[bend right = 15]	node[right]		{\ttfamily read}			(r5);
+			\draw[ -> , visible on = <6>]		(t2)		edge[bend left = 45]		node[below]		{migrate \textbf{Fiber 0}}	(t1);
+			\draw[ -> , visible on = <8>]		(t1)		edge[]				node[right]		{\ttfamily read}			(r3);
+			\draw[ -> , visible on = <9>]		(t1)		edge[]				node[right]		{\ttfamily write(x)}		(r2);
+			\draw[ -> , visible on = <9>]		(f1)		edge[bend right = 15]	node[below right]	{create \textbf{Fiber 1}}	(t0);
+			\draw[ -> , visible on = <11>]		(t1)		edge[bend left = 45]		node[below]		{migrate \textbf{Fiber 0}}	(t0);
+			\draw[ -> , visible on = <11>]		(t0)		edge[bend left = 15]		node[left]			{\ttfamily read}			(r0);
+			\draw[ -> , visible on = <12>]		(t0)		edge[bend left = 15]		node[left]			{\ttfamily read}			(r1);
+			\draw[ -> , visible on = <15>]		(t0)		edge[bend left = 15]		node[left]			{\ttfamily read}			(r0);
+			\draw[ -> , visible on = <16>]		(t0)		edge[bend left = 15]		node[left]			{\ttfamily read}			(r1);
+			\draw[ -> , visible on = <19>]		(t0)		edge[bend right = 45]	node[below]		{migrate \textbf{Fiber 0}}	(t1);
+			\draw[ -> , visible on = <23>]		(t1)		edge[bend right = 45]	node[below]		{migrate \textbf{Fiber 0}}	(t2);
+		\end{tikzpicture}%
+	\end{adjustbox}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Pros \& Cons of DORA I}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	each thread accesses only the records of its partition}
+			\begin{itemize}
+				\visible<4->{\item[$+$]	each CPU cache may contain only data of its partition \bm{$\rightarrow$} lower cache pollution}
+				\visible<5->{\item[$+$]	each CPU may access only data of its partitions \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)}
+				\visible<6->{\item[$\rightarrow$]	No physical synchronization required!}
+			\end{itemize}
+		\visible<7->{\item[$+$]	logical partitioning allows fast repartitioning when the workload changes}
+		\visible<8->{\item[$+$]	multi-site transactions could exploit intra-transaction parallelism}
+		\visible<9->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+	\end{itemize}
+	
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[visible on = <3>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+			\begin{adjustbox}{width = \enhancedtextwidth}%
+				\begin{tikzpicture}
+					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
+							  xlabel near ticks,
+							  xmin = 0,
+							  xmax = 0.9,
+							  xtick distance = {0.1},
+							  scaled x ticks = false,
+							  minor x tick num = 9,
+							  ylabel = {TPC-C district},
+							  ylabel near ticks,
+							  ymin = 0,
+							  ymax = 100,
+							  ymode = normal,
+							  scaled y ticks = false,
+							  legend entries = {{Thread 0}, {Thread 1}, {Thread 2}, {Thread 3}, {Thread 4}, {Thread 5}, {Thread 6}, {Thread 7}, {Thread 8}, {Thread 9}},
+							  legend style = {font = \footnotesize},
+							  legend pos = outer north east,
+							  width = \linewidth,
+							  height = .95\textheight,
+							  axis on top = true,
+							  title = {Record Accesses of DORA DB Threads (\cite{Pandis:2010})}]		
+						\addplot[only marks, mark = x, draw = black] table {data/record_accesses_per_thread_dora_0.csv};
+						\addplot[only marks, mark = x, draw = cyan] table {data/record_accesses_per_thread_dora_1.csv};
+						\addplot[only marks, mark = x, draw = red] table {data/record_accesses_per_thread_dora_2.csv};
+						\addplot[only marks, mark = x, draw = green] table {data/record_accesses_per_thread_dora_3.csv};
+						\addplot[only marks, mark = x, draw = blue] table {data/record_accesses_per_thread_dora_4.csv};
+						\addplot[only marks, mark = x, draw = black!50] table {data/record_accesses_per_thread_dora_5.csv};
+						\addplot[only marks, mark = x, draw = cyan!50] table {data/record_accesses_per_thread_dora_6.csv};
+						\addplot[only marks, mark = x, draw = red!50] table {data/record_accesses_per_thread_dora_7.csv};
+						\addplot[only marks, mark = x, draw = green!50] table {data/record_accesses_per_thread_dora_8.csv};
+						\addplot[only marks, mark = x, draw = blue!50] table {data/record_accesses_per_thread_dora_9.csv};
+					\end{axis}
+				\end{tikzpicture}%
+			\end{adjustbox}%
+		};
+	\end{tikzpicture}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Pros \& Cons of DORA II}
+	
+	\begin{itemize}
+		\visible<2->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<3->{\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)}
+		\visible<4->{\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \bm{$\rightarrow$} slower accesses with secondary index}
+		\visible<5->{\item[$-$]	primary index is shared \bm{$\rightarrow$} centralized latching for inserts/deletes still required \bm{$\rightarrow$} some contention on the shared latch}
+		\visible<6->{\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})}
+	\end{itemize}
+\end{frame}
+
+\subsection[Delegation]{Delegation}
+
+ \begin{frame}
+	\subsectionpage
+	
+	\centering
+	\only<1>{%
+		\resizebox{!}{\architecturesheight}{%
+			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]	&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+				Delegation									&	\delegationDiagram	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+			\end{tabular}%
+		}%
+	}%
+	\only<2>{%
+		\resizebox{!}{.97\architecturesheight}{%
+			\delegationDiagram
+		}%
+	}%
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Properties of Delegation}
+	
+	\begin{itemize}
+		\visible<2->{\item	metadata (incl. locks) are physically partitioned}
+		\visible<3->{\item[$\rightarrow$]	no physical synchronization (latches, atomics) required}
+		\visible<4->{\item	data and indices are physically partitioned}
+		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required}
+		\visible<6->{\item	transactions completely executed by one thread (ideally the one owning the majority of the records)}
+		\visible<7->{\item	thread accesses remote records by passing messages to the threads owning them}
+						\begin{itemize}
+							\visible<8->{\item	message passing implemented using shared variables}
+							\visible<9->{\item	remote records are passed as pointers}
+						\end{itemize}
+	\end{itemize}
+\end{frame}
+
+{
+	\usebackgroundtemplate{%
+		\begin{minipage}[c]{\linewidth}
+		\vspace{5em}
+		\only<13->{\vspace{-2em}}
+		\only<14->{\vspace{-2em}}
+		\only<15->{\vspace{-1em}}
+		\only<16->{\vspace{-2em}}
+		\only<17->{\vspace{-2em}}
+		\only<18->{\vspace{-2em}}
+		\hspace{2em}
+		\resizebox{\linewidth}{!}{%
+			\begin{tikzpicture}
+				\begin{umlseqdiag}
+					\umlactor[no ddots]		{Application 0}
+					\umlactor[no ddots]		{Application 1}
+				
+					\umlobject[no ddots]		{Thread 0}
+					\umlobject[no ddots, /tikz/xshift = 2em]		{Thread 1}
+					
+					\only<2-18>{\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
+						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+							\end{umlcall}}
+						\end{umlcall}}
+						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}]{Thread 0}{Thread 0}
+							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+								\end{umlcall}}					
+								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+								\end{umlcall}}
+								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+								\end{umlcall}}
+							\end{umlcall}}
+						\end{umlcall}}
+					\end{umlcall}}
+					
+					\only<8-11>{\begin{umlcall}[op = {$BOT$}, dt = 31]{Application 1}{Thread 0}
+						\only<9->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<11->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
+						\end{umlcall}}
+					\end{umlcall}}
+
+					\only<19>{\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
+						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+							\end{umlcall}}
+						\end{umlcall}}
+						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
+							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+								\end{umlcall}}					
+								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+								\end{umlcall}}
+								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+								\end{umlcall}}
+							\end{umlcall}}
+						\end{umlcall}}
+					\end{umlcall}}
+
+					\only<20>{\begin{umlcall}[op = {$BOT$}, return = {$EOT$}]{Application 0}{Thread 0}
+						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+							\end{umlcall}}
+							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+							\end{umlcall}}
+						\end{umlcall}}
+						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
+							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+								\end{umlcall}}					
+								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+								\end{umlcall}}
+								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+								\end{umlcall}}
+							\end{umlcall}}
+						\end{umlcall}}
+					\end{umlcall}}
+
+					\only<12->{\begin{umlcall}[op = {$BOT$}, return = {$EOT$}, dt = 31]{Application 1}{Thread 0}
+						\only<9->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}}
+						\only<11->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
+						\end{umlcall}}
+					\end{umlcall}}
+				\end{umlseqdiag}
+				\node[draw = none]	at (17.5, 0)	{};
+			\end{tikzpicture}%
+		}
+		\end{minipage}
+	}
+	 \begin{frame}
+		\frametitle{\colorbox{white}{Example}}
+		
+		\only<2->{}
+		\only<20>{}
+	\end{frame}
+}
+
+ \begin{frame}
+	\frametitle{Pros \& Cons of Delegation}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
+			\begin{itemize}
+				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \bm{$\rightarrow$} lower cache pollution}
+				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \bm{$\rightarrow$} fewer data movement between NUMA regions}
+				\visible<5->{\item[$\rightarrow$]	No physical synchronization required!}
+			\end{itemize}
+		\visible<6->{\item[$+$]	message-passing required for multi-site transactions imposes only a low overhead}
+		\visible<7->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+		\visible<8->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<9->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
+	\end{itemize}
+\end{frame}
+
+\subsection[Partitioned Serial Execution]{Partitioned Serial Execution (PSE)}
+
+ \begin{frame}
+	\subsectionpage
+	
+	\centering
+	\only<1>{%
+		\resizebox{!}{\architecturesheight}{%
+			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+				\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram		&	Partitioned Serial Execution (PSE)
+			\end{tabular}%
+		}%
+	}%
+	\only<2>{%
+		\resizebox{!}{.97\architecturesheight}{%
+			\pseDiagram
+		}%
+	}%
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Properties of PSE}
+	
+	\begin{itemize}
+		\visible<2->{\item	data and associated metadata are physically partitioned \bm{$\rightarrow$} Shared-Nothing}
+		\visible<3->{\item	partition-level locking using latches is used (only exclusive mode)}
+		\visible<4->{\item[$\rightarrow$]	No concurrency control algorithm required!}
+		\visible<5->{\item	single-site transactions run serially on the partition's thread (partition needs to be locked)}
+		\visible<6->{\item	multi-site transactions require upfront to lock of all relevant partitions/coordination between threads}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Pros \& Cons of PSE I}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
+			\begin{itemize}
+				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \bm{$\rightarrow$} lower cache pollution}
+				\visible<3->{\item[$+$]	partition-lock is usually in the CPU cache \bm{$\rightarrow$} synchronization imposes minor overhead}
+				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \bm{$\rightarrow$} fewer data movement between NUMA regions}
+				\visible<5->{\item[$\rightarrow$]	no physical synchronization beyond the partition-lock required}
+			\end{itemize}
+		\visible<6->{\item[$\rightarrow$]	scales linearly for single-site transactions}
+		\visible<7->{\item[$-$]	multi-site transactions require the locking of all relevant partitions \bm{$\rightarrow$} decreases concurrency drastically}
+		\visible<8->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+	\end{itemize}
+\end{frame}
+
+ \begin{frame}
+	\frametitle{Pros \& Cons of PSE II}
+	
+	\begin{itemize}
+		\visible<2->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<3->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
+		\visible<4->{\item[$-$]	coordination of multi-site transactions required}
+	\end{itemize}
+\end{frame}
+
+\subsection[Summary]{Summary}
+
+ \begin{frame}
+	\frametitle{Summary}
+
+	\centering
+	\begin{tabular}{|>{\raggedright}m{\widthof{DORA}}|>{\raggedright}m{\widthof{Message}}|>{\raggedright}m{\widthof{thread-to-data}}|>{\raggedright}m{\widthof{\textbf{Synchro-}}}|>{\raggedright}m{\widthof{Transaction}}|}
+																																																																												\hline
+		\multirow{2}{*}{\centering\parbox[c]{\widthof{DORA}}{\centering\vspace{.75\baselineskip}\textbf{Ar\-chi\-tec\-ture}}}	&	\multicolumn{2}{c|}{\hspace{0pt}\visible<2->{\textbf{Process Management}}}											&	\multicolumn{2}{c|}{\parbox[c]{\widthof{\textbf{Transactional Storage}}}{\centering\vspace{.1\baselineskip}\hspace{0pt}\visible<4->{\textbf{Transactional Storage Management}}\vspace{.1\baselineskip}}} 	\\	\cline{2-5}
+																								&	\hspace{0pt}\visible<2->{\centering\textbf{Pa\-ral\-lel\-ism}}	&	\hspace{0pt}\visible<3->{\centering\textbf{Thread Assignment}}	&	\hspace{0pt}\visible<4->{\centering\textbf{Logical Synchronization}}	&	\hspace{0pt}\visible<5->{\centering\textbf{Physical Synchronization}}													\\	\hline
+		SE/NP																					&	\hspace{0pt}\visible<2->{Shared Memory}	 				& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				&	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{latch/\-atomics}																		\\	\hline
+		PSE																						&	\hspace{0pt}\visible<2->{Shared Nothing}	 				& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				& 	\hspace{0pt}\visible<4->{Partition Lock	}						& 	\hspace{0pt}\visible<5->{partition lock}																		\\	\hline
+		De\-le\-ga\-tion																				&	\hspace{0pt}\visible<2->{Message Passing}	 			& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Message Passing}																	\\	\hline
+		DORA																					&	\hspace{0pt}\visible<2->{Shared Memory}					& 	\hspace{0pt}\visible<3->{thread-to-data}					& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Transaction Migration}																	\\	\hline
+	\end{tabular}
+\end{frame}

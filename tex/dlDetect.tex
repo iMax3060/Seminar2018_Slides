@@ -1,0 +1,29 @@
+\newcommand{\dlDetectDiagram}[1][1.0]{%
+	\tikzset{
+		transaction/.style = {draw = beamer@blendedblue,
+					       text = beamer@blendedblue,
+					       thick,
+					       shape = circle},
+		cancel/.style = {draw = red,
+					thick,
+					shape = cross out,
+					inner sep = 1em,
+					anchor = center},
+		dependency/.style = { -stealth ,
+						 draw = beamer@blendedblue,
+						 fill = beamer@blendedblue,
+						 thick}
+	}	
+
+	\begin{tikzpicture}[opacity = #1,
+	                             baseline = (current bounding box.center)]
+		\node[transaction]					(t1)			{$t_1$};
+		\node[transaction, below = of t1]		(t2)			{$t_2$};
+		\node[transaction, below = of t2]		(t3)			{$t_3$};
+		\node[cancel]	at (t3)							{};
+		
+		\draw[dependency]		(t1)		edge					(t2);
+		\draw[dependency]		(t2)		edge					(t3);
+		\draw[dependency]		(t3)		edge[bend right = 25]	(t1);
+	\end{tikzpicture}%
+}

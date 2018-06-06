@@ -1,0 +1,582 @@
+\section[CC Algorithms]{Concurrency Control Algorithms} \label{sec:cc}
+
+\begin{frame}
+	\sectionpage
+	
+	\centering
+	\resizebox{\linewidth}{!}{%
+		\begin{tabular}{c c c c}
+			\dlDetectDiagram		&	\noWaitDiagram	&	\twoVNoWaitDiagram	&	\siloDiagram	\\
+			\lstinline{DL\_DETECT}	&	\lstinline{NO\_WAIT}	&	\lstinline{2V\_NO\_WAIT}	&	\lstinline{SILO}	\\
+			(2PL)				&	(No Waiting 2PL)	&	(Two Version 2PL)		&	(OCC)
+		\end{tabular}%
+	}
+\end{frame}
+
+\subsection[\lstinline{DL\_DETECT}]{\lstinline{DL\_DETECT} (2PL)}
+
+\begin{frame}
+	\subsectionpage
+	
+	\centering
+	\resizebox{\linewidth}{!}{%
+		\begin{tabular}{c c c c}
+			\dlDetectDiagram		&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
+			\lstinline{DL\_DETECT}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+			(2PL)				&	\textcolor{black!50}{(No Waiting 2PL)}	&	\textcolor{black!50}{(Two Version 2PL)}		&	\textcolor{black!50}{(OCC)}
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL) I}
+	
+	\begin{itemize}
+		\visible<2->{\item	pessimistic concurrency control protocol}
+		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them}	%TODO: cite ARIES/KVL: A Key-Value Locking Method for Concurrency Control of Multiaction Transactions Operating on B-Tree Indexes
+		\visible<5->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation needs to be prevented)}
+		\visible<6->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases the lock}
+	\end{itemize}
+	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
+	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
+	
+	\visible<7->{%
+		\centering
+		\begin{tabular}{| c | c | c |}
+																\hline
+			compatibility	&	shared mode	&	exclusive mode		\\	\hline
+			shared mode	&	\plus			&	\minus			\\	\hline
+			exclusive mode	&	\minus		&	\minus			\\	\hline
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL) II}
+	
+	\begin{itemize}
+		\visible<2->{\item	deadlock detection using a repeatedly generated and analyzed wait-for graph}
+		\visible<3->{\item	intention lock modes ($IS$, $IX$, $SIX$) required for hierarchical locking (database $\leftarrow$ table $\leftarrow$ key range $\leftarrow$ record)}	%TODO: cite Granularity of Locks and Degrees of Consistency in a Shared Data Base
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Example}
+	
+	\tikzset{
+		identifier/.style = {font = \bfseries},
+		transactionName/.style = {},
+		operation/.style = {draw = none,
+					     shape = rectangle,
+					     inner sep = 0pt,
+					     outer sep = 0pt,
+					     label = right:{\scriptsize #1},
+					     anchor = center},
+		record/.style = {draw = none,
+					inner sep = 0pt,
+					outer sep = 0pt,
+					font = \scriptsize},
+		transaction/.style = {draw = black,
+					       shape = circle}					       
+	}
+	
+	\resizebox{\linewidth}{!}{%
+		\begin{tikzpicture}
+			\node[identifier]													(txn)				{Transactions:};
+			
+			\node[transactionName, below = .25em of txn]							(t1)				{$t_1$};
+			\node[transactionName, left = 2em of t1]								(t0)				{$t_0$};
+			\node[transactionName, right = 2em of t1]								(t2)				{$t_2$};
+			
+			\node[visible on = <2->, below = .5em of t0, operation = {BOT}]				(op00)			{$-$};
+			\node[visible on = <3->, below = 1em of op00.center, operation = {$r_0$}]		(op01)			{$-$};
+			\draw[visible on = <3->,  - ]								(op00.center)		--		(op01.center);
+			\node[visible on = <8->, below = 5em of op01.center, operation = {$w_1$}]	(op02)			{$-$};
+			\draw[visible on = <8->,  - ]								(op01.center)		--		(op02.center);
+			\node[visible on = <11->, below = 3em of op02.center, operation = {$c$}]		(op03)			{$-$};
+			\draw[visible on = <11->,  - ]								(op02.center)		--		(op03.center);
+			\node[visible on = <11->, below = 1em of op03.center, operation = {$EOT$}]	(op04)			{$-$};
+			\draw[visible on = <11->, - ]								(op03.center)		--		(op04.center);
+			
+			\node[visible on = <4->, below = 2.5em of t1, operation = {BOT}]			(op10)			{$-$};
+			\node[visible on = <5->, below = 1em of op10.center, operation = {$r_0$}]		(op11)			{$-$};
+			\draw[visible on = <5->,  - ]								(op10.center)		--		(op11.center);
+			\node[visible on = <9->, below = 4em of op11.center, operation = {$w_1$}]		(op12)			{$-$};
+			\draw[visible on = <9->, - ]									(op11.center)		--		(op12.center);
+			\node[visible on = <13->, below = 5em of op12.center, operation = {$w_2$}]	(op13)			{$-$};
+			\draw[visible on = <13->, - ]								(op12.center)		--		(op13.center);
+			\node[visible on = <15->, below = 2em of op13.center, operation = {$c$}]		(op14)			{$-$};
+			\draw[visible on = <15->, - ]								(op13.center)		--		(op14.center);
+			\node[visible on = <15->, below = 1em of op14.center, operation = {$EOT$}]	(op15)			{$-$};
+			\draw[visible on = <15->, - ]								(op14.center)		--		(op15.center);
+			
+			\node[visible on = <6->, below = 4.5em of t2, operation = {BOT}]			(op20)			{$-$};
+			\node[visible on = <7->, below = 1em of op20.center, operation = {$r_0$}]		(op21)			{$-$};
+			\draw[visible on = <7->,  - ]								(op20.center)		--		(op21.center);
+			\node[visible on = <10->, below = 3em of op21.center, operation = {$w_1$}]	(op22)			{$-$};
+			\draw[visible on = <10->, - ]								(op21.center)		--		(op22.center);
+			\node[visible on = <12->, below = 3em of op22.center, operation = {$w_2$}]	(op23)			{$-$};
+			\draw[visible on = <12->, - ]								(op22.center)		--		(op23.center);
+			\node[visible on = <14->, below = 2em of op23.center, operation = {\color{red}$a$}]	(op24)		{$-$};
+			\draw[visible on = <14->, - ]								(op23.center)		--		(op24.center);
+			\node[visible on = <16->, below = 3em of op24.center, operation = {$r_0$}]	(op25)			{$-$};
+			\draw[visible on = <16->, - ]								(op24.center)		--		(op25.center);
+			\node[visible on = <17->, below = 1em of op25.center, operation = {$w_1$}]	(op26)			{$-$};
+			\draw[visible on = <17->, - ]								(op25.center)		--		(op26.center);
+			\node[visible on = <18->, below = 1em of op26.center, operation = {$w_2$}]	(op27)			{$-$};
+			\draw[visible on = <18->, - ]								(op26.center)		--		(op27.center);
+			\node[visible on = <19->, below = 1em of op27.center, operation = {$c$}]		(op28)			{$-$};
+			\draw[visible on = <19->, - ]								(op27.center)		--		(op28.center);
+			\node[visible on = <19->, below = 1em of op28.center, operation = {$EOT$}]	(op29)			{$-$};
+			\draw[visible on = <19->, - ]								(op28.center)		--		(op29.center);
+			
+			
+			
+			\node[identifier, right = 15em of txn]							(lock)			{Locks:};
+			
+			\node[below = .5em of lock, record]							(f1)				{%
+				\begin{tabular}{| r | p{\lockwidth} |}
+																				\hline
+					\multicolumn{2}{| c |}{\textbf{Record 1}}							\\	\hline
+					\only<-7>{Current Mode:		&	\lstinline{NL}					\\	\hline}%
+					\only<8-10>{Current Mode:	&	\lstinline{X} $\left(t_0\right)$		\\	\hline}%
+					\only<11-14>{Current Mode:	&	\lstinline{X} $\left(t_1\right)$		\\	\hline}%
+					\only<15-16>{Current Mode:	&	\lstinline{NL}					\\	\hline}%
+					\only<17-18>{Current Mode:	&	\lstinline{X} $\left(t_2\right)$		\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{NL}					\\	\hline}%
+					\only<-8>{Waiters:			&								\\	\hline}%
+					\only<9>{Waiters:			&	$\left(\text{\lstinline{X}}, t_1\right)$	\\	\hline}%
+					\only<10>{Waiters:			&	$\left(\text{\lstinline{X}}, t_1\right)$	\\%
+											&	$\left(\text{\lstinline{X}}, t_2\right)$	\\	\hline}%
+					\only<11-13>{Waiters:		&	$\left(\text{\lstinline{X}}, t_2\right)$	\\	\hline}%
+					\only<14->{Waiters:			&								\\	\hline}%
+					Data:		&	\only<-8>{$x_1$}\only<9-11>{$x_1'$}\only<12-17>{$x_1''$}\only<18->{$x_1'''$}	\\	\hline
+				\end{tabular}%
+			};			
+			\node[left = 0em of f1.north west, anchor = north east, record]		(f0)				{%
+				\begin{tabular}{| r | p{\lockwidth} |}
+																			\hline
+					\multicolumn{2}{| c |}{\textbf{Record 0}}						\\	\hline
+					\only<-2>{Current Mode:		&	\lstinline{NL}				\\	\hline}%
+					\only<3-4>{Current Mode:		&	\lstinline{S} $\left(1\right)$		\\	\hline}%
+					\only<5-6>{Current Mode:		&	\lstinline{S} $\left(2\right)$		\\	\hline}%
+					\only<7-10>{Current Mode:	&	\lstinline{S} $\left(3\right)$		\\	\hline}%
+					\only<11-13>{Current Mode:	&	\lstinline{S} $\left(2\right)$		\\	\hline}%
+					\only<14>{Current Mode:		&	\lstinline{S} $\left(1\right)$		\\	\hline}%
+					\only<15>{Current Mode:		&	\lstinline{NL}				\\	\hline}%
+					\only<16-18>{Current Mode:	&	\lstinline{S} $\left(1\right)$		\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{NL}				\\	\hline}%
+					Waiters:			&									\\	\hline
+					Data:			&	$x_0$							\\	\hline
+				\end{tabular}%
+			};
+			\node[right = 0em of f1.north east, anchor = north west, record]		(f2)				{%
+				\begin{tabular}{| r | p{\lockwidth} |}
+																				\hline
+					\multicolumn{2}{| c |}{\textbf{Record 2}}							\\	\hline
+					\only<-11>{Current Mode:		&	\lstinline{NL}					\\	\hline}%
+					\only<12-13>{Current Mode:	&	\lstinline{X} $\left(t_2\right)$		\\	\hline}%
+					\only<14>{Current Mode:		&	\lstinline{X} $\left(t_1\right)$		\\	\hline}%
+					\only<15-17>{Current Mode:	&	\lstinline{NL}					\\	\hline}%
+					\only<18>{Current Mode:		&	\lstinline{X} $\left(t_2\right)$		\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{NL}					\\	\hline}%
+					\only<-12>{Waiters:			&								\\	\hline}%
+					\only<13>{Waiters:			&	$\left(\text{\lstinline{X}}, t_1\right)$	\\	\hline}%
+					\only<14->{Waiters:			&								\\	\hline}%
+					Data:		&	\only<-12>{$x_2$}\only<13>{$x_2'$}\only<14>{$x_2$}\only<15-18>{$x_2''$}\only<19->{$x_2'$}	\\	\hline
+				\end{tabular}%
+			};
+			\node[draw = none, right = 0em of f2.north east, anchor = north west](fmore)			{$...$};
+			
+			\node[identifier, below = 10em of lock]						(wfg)				{Wait-for Graph:};
+			
+			\node[visible on = <4-14>, transaction, below = 1em of wfg]		(wt1)				{$t_1$};
+			\node[visible on = <2-10>, transaction, left = 3em of wt1]			(wt0)				{$t_0$};
+			\node[visible on = <6-18>, transaction, right = 3em of wt1]			(wt2)				{$t_2$};
+			
+			\draw[visible on = <9-10>, -> ]		(wt1)			edge						(wt0);
+			\draw[visible on = <10>, -> ]		(wt2)			edge[bend left = 25]			(wt0);
+			\draw[visible on = <11-12>, -> ]		(wt2)			edge[]					(wt1);
+			\draw[visible on = <13>, -> ]		(wt2)			edge[bend left = 25]		node[below, yshift = -6pt, text = red]	{Cycle $\rightarrow$ Deadlock $\rightarrow$ Rollback one Transaction}	(wt1);
+			\draw[visible on = <13>, -> ]		(wt1)			edge[bend left = 25]			(wt2);
+			
+		\end{tikzpicture}
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pros \& Cons of \lstinline{DL\_DETECT} (2PL)}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	aborts only after deadlocks}
+		\visible<3->{\item[$-$]	deadlocks are possible}
+		\visible<4->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
+		\visible<5->{\item[$-$]	calculation and analysis of wait-for graph expensive \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
+		\visible<6->{\item[$-$]	aborts happen \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<7->{\item[$-$]	queue of waiters requires latching \bm{$\rightarrow$} limits scalability}
+		\visible<8->{\item[$-$]	even writes need to acquire latches and wait}
+	\end{itemize}
+\end{frame}
+
+\subsection[\lstinline{NO\_WAIT}]{\lstinline{NO\_WAIT} (No Waiting 2PL)}
+
+\begin{frame}
+	\subsectionpage
+	
+	\centering
+	\resizebox{\linewidth}{!}{%
+		\begin{tabular}{c c c c}
+			\dlDetectDiagram[0.5]					&	\noWaitDiagram	&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
+			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\lstinline{NO\_WAIT}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+			\textcolor{black!50}{(2PL)}					&	(No Waiting 2PL)	&	\textcolor{black!50}{(Two Version 2PL)}		&	\textcolor{black!50}{(OCC)}
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{NO\_WAIT} (No Waiting 2PL) I}
+	
+	\begin{itemize}
+		\visible<2->{\item	pessimistic concurrency control protocol}
+		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them}	%TODO: cite ARIES/KVL: A Key-Value Locking Method for Concurrency Control of Multiaction Transactions Operating on B-Tree Indexes
+		\visible<5->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation automatically prevented)}
+		\visible<6->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ aborts}
+	\end{itemize}
+	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
+	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
+	
+	\visible<7->{%
+		\centering
+		\begin{tabular}{| c | c | c |}
+																\hline
+			compatibility	&	shared mode	&	exclusive mode		\\	\hline
+			shared mode	&	\plus			&	\minus			\\	\hline
+			exclusive mode	&	\minus		&	\minus			\\	\hline
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{NO\_WAIT} (No Waiting 2PL) II}
+	
+	\begin{itemize}
+		\visible<2->{\item	intention lock modes ($IS$, $IX$, $SIX$) required for hierarchical locking (database $\leftarrow$ table $\leftarrow$ key range $\leftarrow$ record)}	%TODO: cite Granularity of Locks and Degrees of Consistency in a Shared Data Base
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Example}
+	
+	\tikzset{
+		identifier/.style = {font = \bfseries},
+		transactionName/.style = {},
+		operation/.style = {draw = none,
+					     shape = rectangle,
+					     inner sep = 0pt,
+					     outer sep = 0pt,
+					     label = right:{\scriptsize #1},
+					     anchor = center},
+		record/.style = {draw = none,
+					inner sep = 0pt,
+					outer sep = 0pt,
+					font = \scriptsize},
+		transaction/.style = {draw = black,
+					       shape = circle}					       
+	}
+	
+	\centering
+	\resizebox{.975\linewidth}{!}{%
+		\begin{tikzpicture}
+			\node[identifier]													(txn)				{Transactions:};
+			
+			\node[transactionName, below = .25em of txn]							(t1)				{$t_1$};
+			\node[transactionName, left = 2em of t1]								(t0)				{$t_0$};
+			\node[transactionName, right = 2em of t1]								(t2)				{$t_2$};
+			
+			\node[visible on = <2->, below = .5em of t0, operation = {BOT}]				(op00)			{$-$};
+			\node[visible on = <3->, below = 1em of op00.center, operation = {$r_0$}]		(op01)			{$-$};
+			\draw[visible on = <3->,  - ]								(op00.center)		--		(op01.center);
+			\node[visible on = <8->, below = 5em of op01.center, operation = {$w_1$}]	(op02)			{$-$};
+			\draw[visible on = <8->,  - ]								(op01.center)		--		(op02.center);
+			\node[visible on = <11->, below = 5em of op02.center, operation = {$c$}]		(op03)			{$-$};
+			\draw[visible on = <11->,  - ]								(op02.center)		--		(op03.center);
+			\node[visible on = <11->, below = 1em of op03.center, operation = {$EOT$}]	(op04)			{$-$};
+			\draw[visible on = <11->, - ]								(op03.center)		--		(op04.center);
+			
+			\node[visible on = <4->, below = 2.5em of t1, operation = {BOT}]			(op10)			{$-$};
+			\node[visible on = <5->, below = 1em of op10.center, operation = {$r_0$}]		(op11)			{$-$};
+			\draw[visible on = <5->,  - ]								(op10.center)		--		(op11.center);
+			\node[visible on = <9->, below = 4em of op11.center, operation = {$w_1$}]		(op12)			{$-$};
+			\draw[visible on = <9->, - ]									(op11.center)		--		(op12.center);
+			\node[visible on = <9->, below = 1em of op12.center, operation = {\color{red}$a$}]	(op13)		{$-$};
+			\draw[visible on = <9->, - ]									(op12.center)		--		(op13.center);
+			\node[visible on = <13->, below = 6em of op13.center, operation = {$r_0$}]	(op14)			{$-$};
+			\draw[visible on = <13->, - ]								(op13.center)		--		(op14.center);
+			\node[visible on = <17->, below = 5em of op14.center, operation = {$w_1$}]	(op15)			{$-$};
+			\draw[visible on = <17->, - ]								(op14.center)		--		(op15.center);
+			\node[visible on = <18->, below = 1em of op15.center, operation = {$w_2$}]	(op16)			{$-$};
+			\draw[visible on = <18->, - ]								(op15.center)		--		(op16.center);
+			\node[visible on = <19->, below = 1em of op16.center, operation = {$c$}]		(op17)			{$-$};
+			\draw[visible on = <19->, - ]								(op16.center)		--		(op17.center);
+			\node[visible on = <19->, below = 1em of op17.center, operation = {$EOT$}]	(op18)			{$-$};
+			\draw[visible on = <19->, - ]								(op17.center)		--		(op18.center);
+			
+			\node[visible on = <6->, below = 4.5em of t2, operation = {BOT}]			(op20)			{$-$};
+			\node[visible on = <7->, below = 1em of op20.center, operation = {$r_0$}]		(op21)			{$-$};
+			\draw[visible on = <7->,  - ]								(op20.center)		--		(op21.center);
+			\node[visible on = <10->, below = 4em of op21.center, operation = {$w_1$}]	(op22)			{$-$};
+			\draw[visible on = <10->, - ]								(op21.center)		--		(op22.center);
+			\node[visible on = <10->, below = 1em of op22.center, operation = {\color{red}$a$}]	(op23)		{$-$};
+			\draw[visible on = <10->, - ]								(op22.center)		--		(op23.center);
+			\node[visible on = <12->, below = 3em of op23.center, operation = {$r_0$}]		(op24)			{$-$};
+			\draw[visible on = <12->, - ]								(op23.center)		--		(op24.center);
+			\node[visible on = <14->, below = 2em of op24.center, operation = {$w_1$}]	(op25)			{$-$};
+			\draw[visible on = <14->, - ]								(op24.center)		--		(op25.center);
+			\node[visible on = <15->, below = 1em of op25.center, operation = {$w_2$}]	(op26)			{$-$};
+			\draw[visible on = <15->, - ]								(op25.center)		--		(op26.center);
+			\node[visible on = <16->, below = 1em of op26.center, operation = {$c$}]		(op27)			{$-$};
+			\draw[visible on = <16->, - ]								(op26.center)		--		(op27.center);
+			\node[visible on = <16->, below = 1em of op27.center, operation = {$EOT$}]	(op28)			{$-$};
+			\draw[visible on = <16->, - ]								(op27.center)		--		(op28.center);
+			
+			
+			
+			\node[identifier, right = 15em of txn]							(lock)			{Locks:};
+			
+			\node[below = .5em of lock, record]							(f1)				{%
+				\begin{tabular}{| r | p{\datawidth} |}
+																				\hline
+					\multicolumn{2}{| c |}{\textbf{Record 1}}							\\	\hline
+					\only<-7>{Current Mode:		&	\lstinline{0}					\\	\hline}%
+					\only<8-10>{Current Mode:	&	\lstinline{1}					\\	\hline}%
+					\only<11-13>{Current Mode:	&	\lstinline{0}					\\	\hline}%
+					\only<14-15>{Current Mode:	&	\lstinline{1}					\\	\hline}%
+					\only<16>{Current Mode:		&	\lstinline{0}					\\	\hline}%
+					\only<17-18>{Current Mode:	&	\lstinline{1}					\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{0}					\\	\hline}%
+					Data:		&	\only<-8>{$x_1$}\only<9-14>{$x_1'$}\only<15-17>{$x_1''$}\only<18->{$x_1'''$}	\\	\hline
+				\end{tabular}%
+			};			
+			\node[left = 0em of f1.north west, anchor = north east, record]		(f0)				{%
+				\begin{tabular}{| r | p{\datawidth} |}
+																			\hline
+					\multicolumn{2}{| c |}{\textbf{Record 0}}						\\	\hline
+					\only<-2>{Current Mode:		&	\lstinline{0}				\\	\hline}%
+					\only<3-4>{Current Mode:		&	\lstinline{2}				\\	\hline}%
+					\only<5-6>{Current Mode:		&	\lstinline{4}				\\	\hline}%
+					\only<7-8>{Current Mode:		&	\lstinline{6}				\\	\hline}%
+					\only<9>{Current Mode:		&	\lstinline{4}				\\	\hline}%
+					\only<10>{Current Mode:		&	\lstinline{2}				\\	\hline}%
+					\only<11>{Current Mode:		&	\lstinline{0}				\\	\hline}%
+					\only<12>{Current Mode:		&	\lstinline{2}				\\	\hline}%
+					\only<13-15>{Current Mode:	&	\lstinline{4}				\\	\hline}%
+					\only<16-18>{Current Mode:	&	\lstinline{2}				\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{0}				\\	\hline}%
+					Data:			&	$x_0$							\\	\hline
+				\end{tabular}%
+			};
+			\node[right = 0em of f1.north east, anchor = north west, record]		(f2)				{%
+				\begin{tabular}{| r | p{\datawidth} |}
+																				\hline
+					\multicolumn{2}{| c |}{\textbf{Record 2}}							\\	\hline
+					\only<-14>{Current Mode:		&	\lstinline{0}					\\	\hline}%
+					\only<15>{Current Mode:		&	\lstinline{1}					\\	\hline}%
+					\only<16-17>{Current Mode:	&	\lstinline{0}					\\	\hline}%
+					\only<18>{Current Mode:		&	\lstinline{1}					\\	\hline}%
+					\only<19->{Current Mode:		&	\lstinline{0}					\\	\hline}%
+					Data:		&	\only<-15>{$x_2$}\only<16-18>{$x_2'$}\only<19->{$x_2''$}	\\	\hline
+				\end{tabular}%
+			};
+			\node[draw = none, right = 0em of f2.north east, anchor = north west](fmore)			{$...$};
+		\end{tikzpicture}
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No Waiting 2PL)}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	deadlocks are impossible}
+		\visible<3->{\item[$+$]	locks can be implemented using a semaphore updated with atomic instructions \bm{$\rightarrow$} scales better than latches}
+		\visible<4->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
+		\visible<5->{\item[$-$]	update-intensive high contention workloads result in many lock conflicts \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<6->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
+	\end{itemize}
+\end{frame}
+
+\subsection[\lstinline{2V\_NO\_WAIT}]{\lstinline{2V\_NO\_WAIT} (Two Version 2PL)}
+
+\begin{frame}
+	\subsectionpage
+	
+	\centering
+	\resizebox{\linewidth}{!}{%
+		\begin{tabular}{c c c c}
+			\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram	&	\siloDiagram[0.5]				\\
+			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\lstinline{2V\_NO\_WAIT}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+			\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No Waiting 2PL)}	&	(Two Version 2PL)		&	\textcolor{black!50}{(OCC)}
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two Version 2PL) I}
+	
+	\begin{itemize}
+		\visible<2->{\item	multiversion pessimistic concurrency control protocol}
+		\visible<3->{\item	3 phases: read, certify, write/commit}
+		\visible<4->{\item	transactions lock records before reading (shared mode $S$)}\visible<5->{, privately updating (exclusive mode $X$)}\visible<6->{ or certifying/globally updating (certify mode $C$) them}
+		\visible<7->{\item	updates happen first on a private copy \bm{$\rightarrow$} committed copy can still be read by other transactions}
+		\visible<8->{\item	before committing writes (replace original record with private copy) the absence of relevant conflicts needs to be certified (certification step)}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two Version 2PL) II}
+	
+	\begin{itemize}
+		\visible<2->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation automatically prevented)}
+		\visible<3->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ aborts}
+	\end{itemize}
+	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
+	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
+	
+	\visible<4->{%
+		\centering
+		\begin{tabular}{| c | c | c | c |}
+																			\hline
+			compatibility	&	shared mode	&	exclusive mode	&	certify mode	\\	\hline
+			shared mode	&	\plus			&	\plus			&	\minus		\\	\hline
+			exclusive mode	&	\plus			&	\minus		&	\minus		\\	\hline
+			certify mode	&	\minus		&	\minus		&	\minus		\\	\hline
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Protocol I}
+	
+	\begin{itemize}
+		\visible<2->{\item[read $r_i$]	\hfill}
+							\begin{itemize}
+								\visible<3->{\item[$C$ acquired]	$r_i$ gets certified or committed by another transaction}
+															\begin{itemize}
+																\visible<4->{\item	\textcolor{red}{abort} this transaction}
+															\end{itemize}
+								\visible<5->{\item[$C$ not acquired]	other threads might read $r_i$ or privately update $r_i$}
+															\begin{itemize}
+																\visible<6->{\item	acquire $r_i$'s lock in $S$ mode}
+																\visible<7->{\item	read global (committed) value of $r_i$}
+															\end{itemize}
+							\end{itemize}
+		\visible<8->{\item[update $r_i$]	\hfill}
+							\begin{itemize}
+								\visible<9->{\item[$W$ acquired]	$r_i$ gets (privately or globally) updated by another transaction \bm{$\rightarrow$} there are already two versions}
+															\begin{itemize}
+																\visible<10->{\item	\textcolor{red}{abort} this transaction}
+															\end{itemize}
+								\visible<11->{\item[$W$ not acquired]	other threads at most read $r_i$}
+															\begin{itemize}
+																\visible<12->{\item	acquire $r_i$'s lock in $X$ mode}
+																\visible<13->{\item	create local copy of global (committed) value of $r_i$}
+																\visible<14->{\item	update local copy of $r_i$}
+															\end{itemize}
+							\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Protocol II}
+	
+	\begin{itemize}
+		\visible<2->{\item[certify $r_i$]	\textit{(only if $r_i$ was updated)}}
+							\begin{itemize}
+								\visible<3->{\item[$S$ acquired]	$r_i$'s global (committed) value gets read by other transaction \bm{$\rightarrow$} globally updating $r_i$ would cause non-repeatable reads}
+															\begin{itemize}
+																\visible<4->{\item	\textcolor{red}{abort} this transaction}
+															\end{itemize}
+								\visible<5->{\item[$S$ not acquired]	other threads at most read $r_i$}
+															\begin{itemize}
+																\visible<6->{\item	acquire $r_i$'s lock in $C$ mode}
+															\end{itemize}
+							\end{itemize}
+		\visible<7->{\item[commit]	\hfill}
+							\begin{itemize}
+								\visible<8->{\item	\textit{(only if $r_i$ was updated)} replace global $r_i$ with updated local version}
+								\visible<9->{\item	release the locks held on $r_i$}
+							\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pros \& Cons \lstinline{2V\_NO\_WAIT} (Two Version 2PL)}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	deadlocks are impossible}
+		\visible<3->{\item[$+$]	transactions can concurrently read while a transaction updates a record}
+		\visible<4->{\item[$+$]	locks can be implemented using a semaphores and a flag updated with atomic instructions \bm{$\rightarrow$} scales better than latches}
+		\visible<5->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
+		\visible<6->{\item[$-$]	update-intensive high contention workloads result in many lock conflicts \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<7->{\item[$-$]	locks still prevent concurrency too often (e.g. blind writes)}
+		\visible<8->{\item[$-$]	additional steps for updates required:}
+							\begin{itemize}
+								\visible<9->{\item	create private copy of updated record (expensive but scalable)}
+								\visible<10->{\item	certify update (cheap)}
+							\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\subsection[\lstinline{SILO}]{\lstinline{SILO} (OCC)}
+
+\begin{frame}
+	\subsectionpage
+	
+	\centering
+	\resizebox{\linewidth}{!}{%
+		\begin{tabular}{c c c c}
+			\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]							&	\siloDiagram			\\
+			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\lstinline{SILO}	\\
+			\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No Waiting 2PL)}	&	\textcolor{black!50}{(Two Version 2PL)}				&	(OCC)
+		\end{tabular}%
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{SILO} (OCC) I}
+	
+	\begin{itemize}
+		\visible<2->{\item	optimistic concurrency control protocol}
+		\visible<3->{\item	3 phases: read, validate, write/commit}
+		\visible<3->{\item	each record contains the transaction ID (global ordered number based on epochs) from the last update}
+		\visible<4->{\item	transactions perform reads and local writes during the read phase without acquiring locks}
+		\visible<5->{\item	read and write sets (records read and written from the transaction) are recorded locally}
+		\visible<6->{\item	read and write sets are used to validate the absence of relevant conflicts}
+		\visible<7->{\item	commit requires three phases: locking of updated records, verification of read set (based on TIDs), execute global writes}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Properties of \lstinline{SILO} (OCC) II}
+	
+	\begin{itemize}
+		\visible<2->{\item	deletes invalidate records using updates \bm{$\rightarrow$} garbage collection required}
+		\visible<3->{\item	records for inserts are created before the validation to provide locks}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pros \& Cons \lstinline{SILO} (OCC)}
+	
+	\begin{itemize}
+		\visible<2->{\item[$+$]	deadlocks are impossible (locks acquired only in last phase \bm{$\rightarrow$} global order can be used)}
+		\visible<3->{\item[$+$]	transactions can concurrently read and write}
+		\visible<4->{\item[$+$]	only actual conflicts cause aborts (optimism)}
+		\visible<5->{\item[$-$]	update-intensive high contention workloads result in many invalid reads \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<6->{\item[$-$]	globally sorted transaction IDs need to be generated (epochs make that cheap)}
+		\visible<7->{\item[$-$]	additional steps for updating transactions required:}
+							\begin{itemize}
+								\visible<8->{\item	record write and read sets locally (expensive but scalable)}
+								\visible<9->{\item	validate reads}
+							\end{itemize}
+	\end{itemize}
+\end{frame}
