@@ -1,46 +1,53 @@
 \section[CC Algorithms]{Concurrency Control Algorithms} \label{sec:cc}
 
 \begin{frame}
-	\sectionpage
-	
-	\centering
-	\resizebox{\linewidth}{!}{%
-		\begin{tabular}{c c c c}
-			\dlDetectDiagram		&	\noWaitDiagram	&	\twoVNoWaitDiagram	&	\siloDiagram	\\
-			\lstinline{DL\_DETECT}	&	\lstinline{NO\_WAIT}	&	\lstinline{2V\_NO\_WAIT}	&	\lstinline{SILO}	\\
-			(2PL)				&	(No Waiting 2PL)	&	(Two Version 2PL)		&	(OCC)
-		\end{tabular}%
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\sectionpage%
+		}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{c c c c}
+				\dlDetectDiagram		&	\noWaitDiagram	&	\twoVNoWaitDiagram	&	\siloDiagram	\\
+				\lstinline{DL\_DETECT}	&	\lstinline{NO\_WAIT}	&	\lstinline{2V\_NO\_WAIT}	&	\lstinline{SILO}	\\
+				(2PL)				&	(No-Waiting-2PL)	&	(Two-Version-2PL)		&	(OCC)
+			\end{tabular}%
+		}%
 	}
 \end{frame}
 
 \subsection[\lstinline{DL\_DETECT}]{\lstinline{DL\_DETECT} (2PL)}
 
 \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\resizebox{\linewidth}{!}{%
-		\begin{tabular}{c c c c}
-			\dlDetectDiagram		&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
-			\lstinline{DL\_DETECT}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-			(2PL)				&	\textcolor{black!50}{(No Waiting 2PL)}	&	\textcolor{black!50}{(Two Version 2PL)}		&	\textcolor{black!50}{(OCC)}
-		\end{tabular}%
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{c c c c}
+				\dlDetectDiagram		&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
+				\lstinline{DL\_DETECT}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+				(2PL)				&	\textcolor{black!50}{(No-Waiting-2PL)}	&	\textcolor{black!50}{(Two-Version-2PL)}		&	\textcolor{black!50}{(OCC)}
+			\end{tabular}%
+		}%
 	}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL) I}
+	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL)}
 	
 	\begin{itemize}
 		\visible<2->{\item	pessimistic concurrency control protocol}
-		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them}	%TODO: cite ARIES/KVL: A Key-Value Locking Method for Concurrency Control of Multiaction Transactions Operating on B-Tree Indexes
-		\visible<5->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation needs to be prevented)}
-		\visible<6->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases the lock}
+		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them	\cite{Mohan:1990}}
+		\visible<5->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
+		\visible<6->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases lock}
+		\visible<7->{\item	deadlock detection using a repeatedly generated and analyzed wait-for graph}
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<7->{%
+	\visible<3->{%
 		\centering
 		\begin{tabular}{| c | c | c |}
 																\hline
@@ -49,15 +56,6 @@
 			exclusive mode	&	\minus		&	\minus			\\	\hline
 		\end{tabular}%
 	}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL) II}
-	
-	\begin{itemize}
-		\visible<2->{\item	deadlock detection using a repeatedly generated and analyzed wait-for graph}
-		\visible<3->{\item	intention lock modes ($IS$, $IX$, $SIX$) required for hierarchical locking (database $\leftarrow$ table $\leftarrow$ key range $\leftarrow$ record)}	%TODO: cite Granularity of Locks and Degrees of Consistency in a Shared Data Base
-	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -197,7 +195,7 @@
 			\draw[visible on = <9-10>, -> ]		(wt1)			edge						(wt0);
 			\draw[visible on = <10>, -> ]		(wt2)			edge[bend left = 25]			(wt0);
 			\draw[visible on = <11-12>, -> ]		(wt2)			edge[]					(wt1);
-			\draw[visible on = <13>, -> ]		(wt2)			edge[bend left = 25]		node[below, yshift = -6pt, text = red]	{Cycle $\rightarrow$ Deadlock $\rightarrow$ Rollback one Transaction}	(wt1);
+			\draw[visible on = <13>, -> ]		(wt2)			edge[bend left = 25]		node[below, yshift = -6pt, text = red]	{Cycle $\rightarrow$ Deadlock $\rightarrow$ Rollback a blocked Transaction}	(wt1);
 			\draw[visible on = <13>, -> ]		(wt1)			edge[bend left = 25]			(wt2);
 			
 		\end{tikzpicture}
@@ -211,41 +209,44 @@
 		\visible<2->{\item[$+$]	aborts only after deadlocks}
 		\visible<3->{\item[$-$]	deadlocks are possible}
 		\visible<4->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
-		\visible<5->{\item[$-$]	calculation and analysis of wait-for graph expensive \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
-		\visible<6->{\item[$-$]	aborts happen \bm{$\rightarrow$} work done before needs to be repeated}
-		\visible<7->{\item[$-$]	queue of waiters requires latching \bm{$\rightarrow$} limits scalability}
+		\visible<5->{\item[$-$]	calculation and analysis of wait-for graph expensive \\ \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
+		\visible<6->{\item[$-$]	aborts happen \\ \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<7->{\item[$-$]	queue of waiters requires latching \\ \bm{$\rightarrow$} limits scalability}
 		\visible<8->{\item[$-$]	even writes need to acquire latches and wait}
 	\end{itemize}
 \end{frame}
 
-\subsection[\lstinline{NO\_WAIT}]{\lstinline{NO\_WAIT} (No Waiting 2PL)}
+\subsection[\lstinline{NO\_WAIT}]{\lstinline{NO\_WAIT} (No-Waiting-2PL)}
 
 \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\resizebox{\linewidth}{!}{%
-		\begin{tabular}{c c c c}
-			\dlDetectDiagram[0.5]					&	\noWaitDiagram	&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
-			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\lstinline{NO\_WAIT}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-			\textcolor{black!50}{(2PL)}					&	(No Waiting 2PL)	&	\textcolor{black!50}{(Two Version 2PL)}		&	\textcolor{black!50}{(OCC)}
-		\end{tabular}%
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{c c c c}
+				\dlDetectDiagram[0.5]					&	\noWaitDiagram	&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
+				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\lstinline{NO\_WAIT}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+				\textcolor{black!50}{(2PL)}					&	(No-Waiting-2PL)	&	\textcolor{black!50}{(Two-Version-2PL)}		&	\textcolor{black!50}{(OCC)}
+			\end{tabular}%
+		}%
 	}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Properties of \lstinline{NO\_WAIT} (No Waiting 2PL) I}
+	\frametitle{Properties of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
 	
 	\begin{itemize}
 		\visible<2->{\item	pessimistic concurrency control protocol}
-		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them}	%TODO: cite ARIES/KVL: A Key-Value Locking Method for Concurrency Control of Multiaction Transactions Operating on B-Tree Indexes
-		\visible<5->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation automatically prevented)}
-		\visible<6->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ aborts}
+		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them	\cite{Mohan:1990}}
+		\visible<5->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
+		\visible<6->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts}
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<7->{%
+	\visible<3->{%
 		\centering
 		\begin{tabular}{| c | c | c |}
 																\hline
@@ -254,14 +255,6 @@
 			exclusive mode	&	\minus		&	\minus			\\	\hline
 		\end{tabular}%
 	}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Properties of \lstinline{NO\_WAIT} (No Waiting 2PL) II}
-	
-	\begin{itemize}
-		\visible<2->{\item	intention lock modes ($IS$, $IX$, $SIX$) required for hierarchical locking (database $\leftarrow$ table $\leftarrow$ key range $\leftarrow$ record)}	%TODO: cite Granularity of Locks and Degrees of Consistency in a Shared Data Base
-	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -393,55 +386,58 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No Waiting 2PL)}
+	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
 	
 	\begin{itemize}
 		\visible<2->{\item[$+$]	deadlocks are impossible}
-		\visible<3->{\item[$+$]	locks can be implemented using a semaphore updated with atomic instructions \bm{$\rightarrow$} scales better than latches}
+		\visible<3->{\item[$+$]	locks can be implemented using a semaphore and atomics \\ \bm{$\rightarrow$} scales better than latches}
 		\visible<4->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
-		\visible<5->{\item[$-$]	update-intensive high contention workloads result in many lock conflicts \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<5->{\item[$-$]	many lock conflicts for update-intensive high-contention workloads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
 		\visible<6->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
 	\end{itemize}
 \end{frame}
 
-\subsection[\lstinline{2V\_NO\_WAIT}]{\lstinline{2V\_NO\_WAIT} (Two Version 2PL)}
+\subsection[\lstinline{2V\_NO\_WAIT}]{\lstinline{2V\_NO\_WAIT} (Two-Version-2PL)}
 
 \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\resizebox{\linewidth}{!}{%
-		\begin{tabular}{c c c c}
-			\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram	&	\siloDiagram[0.5]				\\
-			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\lstinline{2V\_NO\_WAIT}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-			\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No Waiting 2PL)}	&	(Two Version 2PL)		&	\textcolor{black!50}{(OCC)}
-		\end{tabular}%
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{c c c c}
+				\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram	&	\siloDiagram[0.5]				\\
+				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\lstinline{2V\_NO\_WAIT}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
+				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No-Waiting-2PL)}	&	(Two-Version-2PL)		&	\textcolor{black!50}{(OCC)}
+			\end{tabular}%
+		}%
 	}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two Version 2PL) I}
+	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two-Version-2PL) I}
 	
 	\begin{itemize}
 		\visible<2->{\item	multiversion pessimistic concurrency control protocol}
 		\visible<3->{\item	3 phases: read, certify, write/commit}
 		\visible<4->{\item	transactions lock records before reading (shared mode $S$)}\visible<5->{, privately updating (exclusive mode $X$)}\visible<6->{ or certifying/globally updating (certify mode $C$) them}
-		\visible<7->{\item	updates happen first on a private copy \bm{$\rightarrow$} committed copy can still be read by other transactions}
+		\visible<7->{\item	updates happen first on a private copy \\ \bm{$\rightarrow$} committed copy can still be read by other transactions}
 		\visible<8->{\item	before committing writes (replace original record with private copy) the absence of relevant conflicts needs to be certified (certification step)}
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two Version 2PL) II}
+	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two-Version-2PL) II}
 	
 	\begin{itemize}
-		\visible<2->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a compatible mode \bm{$\rightarrow$} $t_0$ can immediately acquire the lock as well (starvation automatically prevented)}
-		\visible<3->{\item	if transaction $t_0$ tries to acquire a lock held by $t_1$ in a incompatible mode \bm{$\rightarrow$} $t_0$ aborts}
+		\visible<2->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
+		\visible<3->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts}
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<4->{%
+	\visible<2->{%
 		\centering
 		\begin{tabular}{| c | c | c | c |}
 																			\hline
@@ -457,7 +453,7 @@
 	\frametitle{Protocol I}
 	
 	\begin{itemize}
-		\visible<2->{\item[read $r_i$]	\hfill}
+		\visible<2->{\item[\textbf{read $r_i$}]	\hfill}
 							\begin{itemize}
 								\visible<3->{\item[$C$ acquired]	$r_i$ gets certified or committed by another transaction}
 															\begin{itemize}
@@ -469,9 +465,9 @@
 																\visible<7->{\item	read global (committed) value of $r_i$}
 															\end{itemize}
 							\end{itemize}
-		\visible<8->{\item[update $r_i$]	\hfill}
+		\visible<8->{\item[\textbf{update $r_i$}]	\hfill}
 							\begin{itemize}
-								\visible<9->{\item[$W$ acquired]	$r_i$ gets (privately or globally) updated by another transaction \bm{$\rightarrow$} there are already two versions}
+								\visible<9->{\item[$W$ acquired]	$r_i$ gets (privately or globally) updated by another transaction \\ \bm{$\rightarrow$} there are already two versions}
 															\begin{itemize}
 																\visible<10->{\item	\textcolor{red}{abort} this transaction}
 															\end{itemize}
@@ -489,9 +485,9 @@
 	\frametitle{Protocol II}
 	
 	\begin{itemize}
-		\visible<2->{\item[certify $r_i$]	\textit{(only if $r_i$ was updated)}}
+		\visible<2->{\item[\textbf{certify $r_i$}]	\textit{(only if $r_i$ was updated)}}
 							\begin{itemize}
-								\visible<3->{\item[$S$ acquired]	$r_i$'s global (committed) value gets read by other transaction \bm{$\rightarrow$} globally updating $r_i$ would cause non-repeatable reads}
+								\visible<3->{\item[$S$ acquired]	$r_i$'s global (committed) value gets read by other transaction \\ \bm{$\rightarrow$} globally updating $r_i$ would cause non-repeatable reads}
 															\begin{itemize}
 																\visible<4->{\item	\textcolor{red}{abort} this transaction}
 															\end{itemize}
@@ -500,7 +496,7 @@
 																\visible<6->{\item	acquire $r_i$'s lock in $C$ mode}
 															\end{itemize}
 							\end{itemize}
-		\visible<7->{\item[commit]	\hfill}
+		\visible<7->{\item[\textbf{commit}]	\hfill}
 							\begin{itemize}
 								\visible<8->{\item	\textit{(only if $r_i$ was updated)} replace global $r_i$ with updated local version}
 								\visible<9->{\item	release the locks held on $r_i$}
@@ -509,14 +505,14 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Pros \& Cons \lstinline{2V\_NO\_WAIT} (Two Version 2PL)}
+	\frametitle{Pros \& Cons \lstinline{2V\_NO\_WAIT} (Two-Version-2PL)}
 	
 	\begin{itemize}
 		\visible<2->{\item[$+$]	deadlocks are impossible}
-		\visible<3->{\item[$+$]	transactions can concurrently read while a transaction updates a record}
-		\visible<4->{\item[$+$]	locks can be implemented using a semaphores and a flag updated with atomic instructions \bm{$\rightarrow$} scales better than latches}
+		\visible<3->{\item[$+$]	transactions can read while a transaction updates a record}
+		\visible<4->{\item[$+$]	locks can be implemented using a semaphore and a flag updated with atomic instructions \\ \bm{$\rightarrow$} scales better than latches}
 		\visible<5->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
-		\visible<6->{\item[$-$]	update-intensive high contention workloads result in many lock conflicts \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<6->{\item[$-$]	update-intensive high-contention workloads result in many lock conflicts \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
 		\visible<7->{\item[$-$]	locks still prevent concurrency too often (e.g. blind writes)}
 		\visible<8->{\item[$-$]	additional steps for updates required:}
 							\begin{itemize}
@@ -529,15 +525,18 @@
 \subsection[\lstinline{SILO}]{\lstinline{SILO} (OCC)}
 
 \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\resizebox{\linewidth}{!}{%
-		\begin{tabular}{c c c c}
-			\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]							&	\siloDiagram			\\
-			\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\lstinline{SILO}	\\
-			\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No Waiting 2PL)}	&	\textcolor{black!50}{(Two Version 2PL)}				&	(OCC)
-		\end{tabular}%
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{c c c c}
+				\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]							&	\siloDiagram			\\
+				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\lstinline{SILO}	\\
+				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No-Waiting-2PL)}	&	\textcolor{black!50}{(Two-Version-2PL)}				&	(OCC)
+			\end{tabular}%
+		}%
 	}
 \end{frame}
 
@@ -549,9 +548,6 @@
 		\visible<3->{\item	3 phases: read, validate, write/commit}
 		\visible<3->{\item	each record contains the transaction ID (global ordered number based on epochs) from the last update}
 		\visible<4->{\item	transactions perform reads and local writes during the read phase without acquiring locks}
-		\visible<5->{\item	read and write sets (records read and written from the transaction) are recorded locally}
-		\visible<6->{\item	read and write sets are used to validate the absence of relevant conflicts}
-		\visible<7->{\item	commit requires three phases: locking of updated records, verification of read set (based on TIDs), execute global writes}
 	\end{itemize}
 \end{frame}
 
@@ -559,8 +555,11 @@
 	\frametitle{Properties of \lstinline{SILO} (OCC) II}
 	
 	\begin{itemize}
-		\visible<2->{\item	deletes invalidate records using updates \bm{$\rightarrow$} garbage collection required}
-		\visible<3->{\item	records for inserts are created before the validation to provide locks}
+		\visible<2->{\item	read and write sets (records read and written by the transaction) are recorded locally}
+		\visible<3->{\item	read and write sets used to validate absence of relevant conflicts}
+		\visible<4->{\item	commit requires three phases: locking of updated records, verification of read set (based on TIDs), execute global writes}
+		\visible<5->{\item	deletes invalidate records using updates \\ \bm{$\rightarrow$} garbage collection required}
+		\visible<6->{\item	records for inserts created before validation to provide locks}
 	\end{itemize}
 \end{frame}
 
@@ -571,11 +570,11 @@
 		\visible<2->{\item[$+$]	deadlocks are impossible (locks acquired only in last phase \bm{$\rightarrow$} global order can be used)}
 		\visible<3->{\item[$+$]	transactions can concurrently read and write}
 		\visible<4->{\item[$+$]	only actual conflicts cause aborts (optimism)}
-		\visible<5->{\item[$-$]	update-intensive high contention workloads result in many invalid reads \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<5->{\item[$-$]	update-intensive high-contention workloads result in many invalid reads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
 		\visible<6->{\item[$-$]	globally sorted transaction IDs need to be generated (epochs make that cheap)}
 		\visible<7->{\item[$-$]	additional steps for updating transactions required:}
 							\begin{itemize}
-								\visible<8->{\item	record write and read sets locally (expensive but scalable)}
+								\visible<8->{\item	write and read sets locally (expensive but scalable)}
 								\visible<9->{\item	validate reads}
 							\end{itemize}
 	\end{itemize}

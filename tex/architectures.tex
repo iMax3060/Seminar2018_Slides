@@ -1,62 +1,70 @@
 \section[DB Architectures]{Database Architectures} \label{sec:architectures}
 
- \begin{frame}
-	\sectionpage
-	
-	\centering
-	\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-		Shared Everything/ Non-Partitioned	&	\seDiagram		&	\doraDiagram	&	Data-Oriented Transaction Execution (DORA)	\\
-		Delegation					&	\delegationDiagram	&	\pseDiagram	&	Partitioned Serial Execution (PSE)
-	\end{tabular}
+\begin{frame}
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\sectionpage%
+		}
+		\centering
+		\resizebox{!}{.975\architecturesheight}{%
+			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+				Shared Everything/ Non-Partitioned	&	\seDiagram		&	\doraDiagram	&	Data-Oriented Transaction Execution (DORA)	\\
+				Delegation					&	\delegationDiagram	&	\pseDiagram	&	Partitioned Serial Execution (PSE)
+			\end{tabular}%
+		}%
+	}
 \end{frame}
 
 \subsection[Shared Everything/\-Non-Partitioned]{Shared Everything/\-Non-Partitioned (SE/NP)}
 
- \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\only<1>{%
-		\resizebox{!}{\architecturesheight}{%
-			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-				Shared Everything/ Non-Partitioned	&	\seDiagram			&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
-				\textcolor{black!50}{Delegation}		&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
-			\end{tabular}%
+\begin{frame}
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\only<1>{%
+			\resizebox{!}{.975\architecturesheight}{%
+				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+					Shared Everything/ Non-Partitioned	&	\seDiagram			&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					\textcolor{black!50}{Delegation}		&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+				\end{tabular}%
+			}%
 		}%
-	}%
-	\only<2>{%
-		\resizebox{!}{.97\architecturesheight}{%
-			\seDiagram%
+		\only<2>{%
+			\resizebox{!}{.91\architecturesheight}{%
+				\seDiagram%
+			}%
 		}%
-	}%
+	}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Properties of SE/NP}
 	
 	\begin{itemize}
-		\visible<2->{\item	metadata (incl. locks) aren't partitioned}
-		\visible<3->{\item[$\rightarrow$]	physical synchronization (latches, atomic instructions) required}
-		\visible<4->{\item	data and indices aren't partitioned}
+		\visible<2->{\item	metadata (incl. locks) are not partitioned}
+		\visible<3->{\item[$\rightarrow$]	physical synchronization (latches, atomics) required}
+		\visible<4->{\item	data and indices are not partitioned}
 		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol also required}
 		\visible<6->{\item	transactions completely executed by one thread}
 		\visible<6->{\item	thread-assignment depends only on load}
 	\end{itemize}
 \end{frame}
 
- \begin{frame}[fragile]
+\begin{frame}[fragile]
 	\frametitle{Pros \& Cons of SE/NP}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	no partitioning required (e.g. manual selection of a partitioning strategy)}
+		\visible<2->{\item[$+$]	no partitioning required (e.g. manual selection of a strategy)}
 		\visible<3->{\item[$+$]	partitioning would be sensitive to the workload}
-		\visible<4->{\item[$+$]	changed workloads would require (probably expensive) repartitioning to benefit from partitioning}
+		\visible<4->{\item[$+$]	changed workloads would require repartitioning to benefit from partitioning}
 		\visible<5->{\item[$-$]	each thread might access every record at arbitrary times}
 			\begin{itemize}
-				\visible<17->{\item[$-$]	each CPU cache may contain any part of the data \bm{$\rightarrow$} cache pollution}
-				\visible<19->{\item[$-$]	each CPU may access any part of the data \bm{$\rightarrow$} data movement between NUMA regions}
-				\visible<21->{\item[$-$]	each CPU may acquire any latch \bm{$\rightarrow$} data movement between NUMA regions}
-				\visible<22->{\item[$-$]	each CPU may atomically write to any semaphore \bm{$\rightarrow$} hardware cache coherence overhead}
+				\visible<17->{\item[$-$]	each CPU cache may contain any part of the data \\ \bm{$\rightarrow$} cache pollution}
+				\visible<19->{\item[$-$]	each CPU may access any part of the data \\ \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<21->{\item[$-$]	each CPU may acquire any latch \\ \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<22->{\item[$-$]	each CPU may atomically write to any semaphore \\ \bm{$\rightarrow$} hardware cache coherence overhead}
 			\end{itemize}
 	\end{itemize}
     
@@ -69,7 +77,7 @@
 
 	\begin{tikzpicture}[remember picture, overlay]
 		\node[visible on = <6-16>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
-			\begin{adjustbox}{width = \enhancedtextwidth}%
+			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
 							  xlabel near ticks,
@@ -106,7 +114,7 @@
 			\end{adjustbox}%
     												   };
 		\node[visible on = <18>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
-			\begin{adjustbox}{width = \textwidth + 4.0em}
+			\begin{adjustbox}{width = .85\enhancedtextwidth}
 				\begin{tikzpicture}[]
 							% Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
 							\node[]			(0)															{};
@@ -250,7 +258,7 @@
 			\end{adjustbox}
     												   };
 		\node[visible on = <20>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
-			\begin{adjustbox}{width = \enhancedtextwidth}%
+			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[major x tick style = transparent,
 							   ybar = 2*\pgflinewidth,
@@ -282,26 +290,29 @@
 
 \subsection[DORA]{Data-Oriented Transaction Execution (DORA)}
 
- \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\only<1>{%
-		\resizebox{!}{\architecturesheight}{%
-			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram		&	Data-Oriented Transaction Execution (DORA)			\\
-				\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
-			\end{tabular}%
+\begin{frame}
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\only<1>{%
+			\resizebox{!}{.975\architecturesheight}{%
+				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram		&	Data-Oriented Transaction Execution (DORA)			\\
+					\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+				\end{tabular}%
+			}%
 		}%
-	}%
-	\only<2>{%
-		\resizebox{!}{.97\architecturesheight}{%
-			\doraDiagram%
+		\only<2>{%
+			\resizebox{!}{.91\architecturesheight}{%
+				\doraDiagram%
+			}%
 		}%
-	}%
+	}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Properties of DORA}
 	
 	\begin{itemize}
@@ -314,7 +325,7 @@
 	\end{itemize}
 \end{frame}
 
- \begin{frame}[fragile]
+\begin{frame}[fragile]
 	\frametitle{Example}
 	
 	\tikzset{
@@ -466,24 +477,23 @@
 	\end{adjustbox}
 \end{frame}
 
- \begin{frame}
-	\frametitle{Pros \& Cons of DORA I}
+\begin{frame}
+	\frametitle{Pros of DORA}
 	
 	\begin{itemize}
 		\visible<2->{\item[$+$]	each thread accesses only the records of its partition}
 			\begin{itemize}
-				\visible<4->{\item[$+$]	each CPU cache may contain only data of its partition \bm{$\rightarrow$} lower cache pollution}
-				\visible<5->{\item[$+$]	each CPU may access only data of its partitions \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)}
+				\visible<4->{\item[$+$]	each CPU cache may contain only data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
+				\visible<5->{\item[$+$]	each CPU may access only data of its partitions \\ \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)}
 				\visible<6->{\item[$\rightarrow$]	No physical synchronization required!}
 			\end{itemize}
 		\visible<7->{\item[$+$]	logical partitioning allows fast repartitioning when the workload changes}
-		\visible<8->{\item[$+$]	multi-site transactions could exploit intra-transaction parallelism}
-		\visible<9->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+		\visible<8->{\item[$+$]	intra-transaction parallelism could be exploited for multi-site transactions}
 	\end{itemize}
 	
 	\begin{tikzpicture}[remember picture, overlay]
 		\node[visible on = <3>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
-			\begin{adjustbox}{width = \enhancedtextwidth}%
+			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
 							  xlabel near ticks,
@@ -522,40 +532,44 @@
 	\end{tikzpicture}
 \end{frame}
 
- \begin{frame}
-	\frametitle{Pros \& Cons of DORA II}
+\begin{frame}
+	\frametitle{Cons of DORA}
 	
 	\begin{itemize}
-		\visible<2->{\item[$-$]	partitioning is sensitive to the workload}
-		\visible<3->{\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)}
-		\visible<4->{\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \bm{$\rightarrow$} slower accesses with secondary index}
-		\visible<5->{\item[$-$]	primary index is shared \bm{$\rightarrow$} centralized latching for inserts/deletes still required \bm{$\rightarrow$} some contention on the shared latch}
-		\visible<6->{\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})}
+		\visible<2->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+		\visible<3->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<4->{\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)}
+		\visible<5->{\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \\ \bm{$\rightarrow$} slower accesses with secondary index}
+		\visible<6->{\item[$-$]	primary index is shared \\ \bm{$\rightarrow$} centralized latching for inserts/\-deletes still required \\ \bm{$\rightarrow$} some contention on the shared latch}
+		\visible<7->{\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})}
 	\end{itemize}
 \end{frame}
 
 \subsection[Delegation]{Delegation}
 
- \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\only<1>{%
-		\resizebox{!}{\architecturesheight}{%
-			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]	&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
-				Delegation									&	\delegationDiagram	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
-			\end{tabular}%
+\begin{frame}
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\only<1>{%
+			\resizebox{!}{.975\architecturesheight}{%
+				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]	&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					Delegation									&	\delegationDiagram	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
+				\end{tabular}%
+			}%
 		}%
-	}%
-	\only<2>{%
-		\resizebox{!}{.97\architecturesheight}{%
-			\delegationDiagram
+		\only<2>{%
+			\resizebox{!}{.91\architecturesheight}{%
+				\delegationDiagram
+			}%
 		}%
-	}%
+	}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Properties of Delegation}
 	
 	\begin{itemize}
@@ -700,14 +714,14 @@
 	\end{frame}
 }
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Pros \& Cons of Delegation}
 	
 	\begin{itemize}
 		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
 			\begin{itemize}
-				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \bm{$\rightarrow$} lower cache pollution}
-				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \bm{$\rightarrow$} fewer data movement between NUMA regions}
+				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
+				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions}
 				\visible<5->{\item[$\rightarrow$]	No physical synchronization required!}
 			\end{itemize}
 		\visible<6->{\item[$+$]	message-passing required for multi-site transactions imposes only a low overhead}
@@ -719,67 +733,70 @@
 
 \subsection[Partitioned Serial Execution]{Partitioned Serial Execution (PSE)}
 
- \begin{frame}
-	\subsectionpage
-	
-	\centering
-	\only<1>{%
-		\resizebox{!}{\architecturesheight}{%
-			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-				\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
-				\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram		&	Partitioned Serial Execution (PSE)
-			\end{tabular}%
+\begin{frame}
+	\vbox to .6\textheight{%
+		\parbox[c][.225\textheight][c]{\linewidth}{%
+			\subsectionpage%
+		}
+		\centering
+		\only<1>{%
+			\resizebox{!}{.975\architecturesheight}{%
+				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
+					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram		&	Partitioned Serial Execution (PSE)
+				\end{tabular}%
+			}%
 		}%
-	}%
-	\only<2>{%
-		\resizebox{!}{.97\architecturesheight}{%
-			\pseDiagram
+		\only<2>{%
+			\resizebox{!}{.91\architecturesheight}{%
+				\pseDiagram
+			}%
 		}%
-	}%
+	}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Properties of PSE}
 	
 	\begin{itemize}
-		\visible<2->{\item	data and associated metadata are physically partitioned \bm{$\rightarrow$} Shared-Nothing}
-		\visible<3->{\item	partition-level locking using latches is used (only exclusive mode)}
+		\visible<2->{\item	data and associated metadata are physically partitioned \\ \bm{$\rightarrow$} Shared-Nothing}
+		\visible<3->{\item	partition-level locking using latches (only exclusive mode)}
 		\visible<4->{\item[$\rightarrow$]	No concurrency control algorithm required!}
 		\visible<5->{\item	single-site transactions run serially on the partition's thread (partition needs to be locked)}
 		\visible<6->{\item	multi-site transactions require upfront to lock of all relevant partitions/coordination between threads}
 	\end{itemize}
 \end{frame}
 
- \begin{frame}
-	\frametitle{Pros \& Cons of PSE I}
+\begin{frame}
+	\frametitle{Pros of PSE}
 	
 	\begin{itemize}
 		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
 			\begin{itemize}
-				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \bm{$\rightarrow$} lower cache pollution}
-				\visible<3->{\item[$+$]	partition-lock is usually in the CPU cache \bm{$\rightarrow$} synchronization imposes minor overhead}
-				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \bm{$\rightarrow$} fewer data movement between NUMA regions}
+				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
+				\visible<3->{\item[$+$]	partition-lock is usually in the CPU cache \\ \bm{$\rightarrow$} synchronization imposes minor overhead}
+				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions}
 				\visible<5->{\item[$\rightarrow$]	no physical synchronization beyond the partition-lock required}
 			\end{itemize}
 		\visible<6->{\item[$\rightarrow$]	scales linearly for single-site transactions}
-		\visible<7->{\item[$-$]	multi-site transactions require the locking of all relevant partitions \bm{$\rightarrow$} decreases concurrency drastically}
-		\visible<8->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
 	\end{itemize}
 \end{frame}
 
- \begin{frame}
-	\frametitle{Pros \& Cons of PSE II}
+\begin{frame}
+	\frametitle{Cons of PSE}
 	
 	\begin{itemize}
-		\visible<2->{\item[$-$]	partitioning is sensitive to the workload}
-		\visible<3->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
-		\visible<4->{\item[$-$]	coordination of multi-site transactions required}
+		\visible<2->{\item[$-$]	multi-site transactions require locking of all relevant partitions \\ \bm{$\rightarrow$} decreases concurrency drastically}
+		\visible<3->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+		\visible<4->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<5->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
+		\visible<6->{\item[$-$]	coordination of multi-site transactions required}
 	\end{itemize}
 \end{frame}
 
 \subsection[Summary]{Summary}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Summary}
 
 	\centering

@@ -1,6 +1,6 @@
 \section[Performance Evaluation]{Performance Evaluation} \label{sec:evaluation}
 
- \begin{frame}
+\begin{frame}
 	\sectionpage
 	
 	\vspace{3em}
@@ -76,7 +76,7 @@
 %}{}%
 %\makeatother%
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Evaluation Set-Up}
 	
 	\begin{itemize}
@@ -91,7 +91,7 @@
 	\end{itemize}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Benchmarks}
 	
 	\begin{block}{Microbenchmark}
@@ -109,14 +109,14 @@
 		\begin{itemize}
 			\item	\SI{20}{\giga\byte} database
 			\item	\num{20000000} records
-			\item	Txn: reads/updates 16 records following zipfian distribution according to parameter $\Theta$
+			\item	Txn: reads/updates 16 records following Zipfian distribution according to parameter $\Theta$
 		\end{itemize}
 	\end{block}
 \end{frame}
 
 \subsection[Read-Only Workload]{Read-Only Workload} \label{subsec:read}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Read-Only Microbenchmark}
 
 	\hspace{-2em}%
@@ -185,14 +185,14 @@
 					\only<9->{\item	\ref{label:dora}/\ref{label:delegation} suffer more from remote data accesses than \ref{label:se} suffers from cache coherence}
 					\only<11->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for read-only}
 					\only<13->{\item	\ref{label:silo} behaves identical for \ref{label:se} and \ref{label:delegation} for read-only}
-					\only<15->{\item	coarse-grained partition locking of \ref{label:pse} doesn't scale due to multi-site workload}
+					\only<15->{\item	coarse-grained partition locking of \ref{label:pse} does not scale due to multi-site workload}
 				\end{itemize}}
 			\end{block}
 		\end{column}
 	\end{columns}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Multi-Site Read-Only Microbenchmark}
 
 	\hspace{-2em}%
@@ -249,7 +249,7 @@
 			\footnotesize
 			\begin{block}{Observations}
 				\only<3->{\begin{itemize}
-					\only<3-7>{\item	\ref{label:se} doesn't know remote records}
+					\only<3-7>{\item	\ref{label:se} does not know remote records}
 					\only<5-8>{\item	\ref{label:dora}/\ref{label:delegation} outperform \ref{label:se} for $0$ remote records due to lower cache coherence activity}
 					\only<6->{\item	\ref{label:dora}/\ref{label:delegation} suffer from remote data access overhead for $>0$ remote records}
 					\only<8->{\item	coarse-grained partition locking of \ref{label:pse} imposes nearly no overhead for suitable partitioning}
@@ -262,7 +262,7 @@
 
 \subsection[Update-Only Workload]{Update-Only Workload} \label{subsec:update}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Update-Only Microbenchmark}
 
 	\hspace{-2em}%
@@ -410,8 +410,8 @@
 					\only<3-6>{\item	abort rate scales for \ref{label:dlDetect} due to higher contention \bm{$\rightarrow$} deadlocks}
 					\only<5-9>{\item	$\left[\si{\mega\transactions\per\second}\right]$ suffers from aborts and lock thrashing}
 					\only<6-10>{\item	\ref{label:dora}/\ref{label:delegation} suffer more from remote data access overhead}
-					\only<7-10>{\item	latch contention isn't the bottleneck \bm{$\rightarrow$} \ref{label:se} can outperform \ref{label:dora}/\ref{label:delegation}}
-					\only<10-13>{\item	lock thrashing doesn't cause many aborts for \ref{label:noWait} with \ref{label:se} for few threads}
+					\only<7-10>{\item	latch contention is not the bottleneck \bm{$\rightarrow$} \ref{label:se} can outperform \ref{label:dora}/\ref{label:delegation}}
+					\only<10-13>{\item	lock thrashing does not cause many aborts for \ref{label:noWait} with \ref{label:se} for few threads}
 					\only<11-15>{\item	lock thrashing caused by long commit latencies caused by overloaded (hot) partitions causes many aborts for \ref{label:dora}/\ref{label:delegation}}
 					\only<13-19>{\item	the aborts are the major bottleneck for \ref{label:noWait}}
 					\only<14-19>{\item	latching overhead and deadlocks $\rightarrow$ \ref{label:noWait} outperforms \ref{label:dlDetect} for \ref{label:se}}
@@ -428,7 +428,7 @@
 
 \subsection[Read-Only YCSB Workload]{Read-Only YCSB Workload} \label{subsec:readYCSB}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Read-Only YCSB ($\Theta = 0.8$)}
 
 	\hspace{-2em}%
@@ -488,7 +488,7 @@
 			\begin{block}{Observations}
 				\only<3->{\begin{itemize}
 					\only<3-8>{\item	\ref{label:se} scales well with \ref{label:dlDetect} until the latch contention becomes a bottleneck}
-					\only<4-10>{\item	\ref{label:delegation} (and \ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+					\only<4-10>{\item	\ref{label:delegation} (and \ref{label:dora}) does not scale well due to partition-unfriendly Zipfian access distribution}
 					\only<6->{\item	atomics of \ref{label:noWait} scale better than latches of \ref{label:dlDetect}}
 					\only<7->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for read-only}
 					\only<9->{\item	\ref{label:silo} lags behind \ref{label:2vNoWait} due to the overhead of copying read (large) records for validation}
@@ -501,7 +501,7 @@
 
 \subsection[Update-Only YCSB Workload]{Update-Only YCSB Workload} \label{subsec:updateYCSB}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Update-Only YCSB ($\Theta = 0.8$)}
 
 	\hspace{-2em}%
@@ -559,17 +559,17 @@
 			\begin{block}{Observations}
 				\only<3->{\begin{itemize}
 					\only<3-9>{\item	\ref{label:dlDetect} suffers from deadlocks for many threads}
-					\only<5->{\item	lock thrashing (aborts for \ref{label:noWait}) isn't a bottleneck due to lower contention}
+					\only<5->{\item	lock thrashing (aborts for \ref{label:noWait}) is not a bottleneck due to lower contention}
 					\only<6->{\item	\ref{label:2vNoWait} and \ref{label:noWait} perform identical for update-only}
 					\only<8->{\item	\ref{label:silo} causes less aborts than \ref{label:noWait} due its optimism $\rightarrow$ higher $\left[\si{\mega\transactions\per\second}\right]$}
-					\only<10->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+					\only<10->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) does not scale well due to partition-unfriendly Zipfian access distribution}
 				\end{itemize}}
 			\end{block}
 		\end{column}
 	\end{columns}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Update-Only YCSB (72 Threads)}
 
 	\hspace{-2em}%
@@ -631,7 +631,7 @@
 					\only<4->{\item	copying records imposes an overhead to \ref{label:2vNoWait}/\ref{label:silo}}
 					\only<5->{\item	atomics of \ref{label:noWait} scale better than latches of \ref{label:dlDetect}}
 					\only<6->{\item	\ref{label:silo} causes less aborts than \ref{label:noWait} due its optimism $\rightarrow$ higher $\left[\si{\mega\transactions\per\second}\right]$}
-					\only<8->{\item	\ref{label:pse} doesn't scale well due to partition-unfriendly zipfian access distribution}
+					\only<8->{\item	\ref{label:pse} does not scale well due to partition-unfriendly Zipfian access distribution}
 				\end{itemize}}
 			\end{block}
 		\end{column}
@@ -640,7 +640,7 @@
 
 \subsection[Mixed YCSB Workload]{Mixed YCSB Workload} \label{subsec:mixedYCSB}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Mixed YCSB ($\Theta = 0.8$, 72 Threads)}
 
 	\hspace{-2em}%
@@ -704,7 +704,7 @@
 					\only<7-11>{\item	multi-versioning of \ref{label:2vNoWait} improves concurrency for mixed workloads}
 					\only<9->{\item	\ref{label:silo} lags behind \ref{label:2vNoWait} due to the overhead of copying read (large) records for validation}
 					\only<10->{\item	\ref{label:silo} causes less aborts than \ref{label:2vNoWait} due its optimism for many writers}
-					\only<12->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) doesn't scale well due to partition-unfriendly zipfian access distribution}
+					\only<12->{\item	\ref{label:pse} (and \ref{label:delegation}/\ref{label:dora}) does not scale well due to partition-unfriendly Zipfian access distribution}
 				\end{itemize}}
 			\end{block}
 		\end{column}
@@ -713,26 +713,26 @@
 
 \subsection[Conclusion]{Conclusion} \label{subsec:conclusion}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Conclusion I}
 
 	\begin{itemize}
-		\visible<2->{\item	optimistic CC scales better than pessimistic CC for most workloads}
+		\visible<2->{\item	optimistic concurrency control scales better than pessimistic CC for most workloads}
 		\visible<3->{\item	optimistic CC suffers from large record sizes}
 		\visible<4->{\item	atomic operations scale better than latches}
-		\visible<5->{\item	partitioning make latches scalable}
-		\visible<6->{\item	2PL doesn't scale for mixed workloads}
+		\visible<5->{\item	partitioning makes latches scalable}
+		\visible<6->{\item	2PL does not scale for mixed workloads}
 		\visible<7->{\item	partitioning DB architectures perform bad under partition-unfriendly workloads}
 		\visible<8->{\item	partitioning DB architectures perform bad under multi-sited transactions}
 	\end{itemize}
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Conclusion II}
 
 	\begin{itemize}
-		\visible<2->{\item	the transaction throughput decreases by an order of magnitude for update-only instead of read-only workloads (PSE is insensitive to writes) \bm{$\rightarrow$} PSE scales best for update-intensive workloads}
-		\visible<3->{\item	PSE doesn't scale for read-intensive high contention workloads wth small hot sets}
+		\visible<2->{\item	the transaction throughput decreases by an order of magnitude for update-only instead of read-only workloads (PSE is insensitive to writes) \\ \bm{$\rightarrow$} PSE scales best for update-intensive workloads}
+		\visible<3->{\item	PSE does not scale for read-intensive high-contention workloads with small hot sets}
 		\visible<4->{\item[$\rightarrow$]	None of the architectures or CC protocols outperform the others for any workload!}
 		\visible<5->{\item[$\rightarrow$]	Every architecture and CC protocol performs very bad for some specific workload!}
 	\end{itemize}
@@ -740,13 +740,13 @@
 
 \subsection[Discussion]{Discussion} \label{subsec:discussion}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Discussion of the Performance Evaluation}
 
 	\begin{itemize}
-		\visible<2->{\item	read-only and update-only workload aren't appropriate to evaluate concurrency control algorithms}
-		\visible<3->{\item	partition-unfriendly workloads aren't appropriate to evaluate database architectures that use partitioning}
+		\visible<2->{\item	read-only and update-only workload are not appropriate to evaluate concurrency control algorithms}
+		\visible<3->{\item	partition-unfriendly workloads are not appropriate to evaluate database architectures that use partitioning}
 		\visible<4->{\item	neither the microbenchmark nor YCSB are OLTP benchmarks}
-		\visible<5->{\item[$\rightarrow$]	The authors didn't properly analyze the combination of database architecture and concurrency control algorithm for OLTP workloads!}
+		\visible<5->{\item[$\rightarrow$]	The authors did not properly analyze the combination of database architecture and concurrency control algorithm for OLTP workloads!}
 	\end{itemize}
 \end{frame}

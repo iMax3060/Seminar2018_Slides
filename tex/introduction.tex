@@ -1,10 +1,10 @@
 \section[Introduction]{Introduction} \label{sec_intro}
 
- \begin{frame}
+\begin{frame}
 	\sectionpage
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	
     \frametitle{Requirements for a DBMS}
     
@@ -24,7 +24,7 @@
     \end{itemize}
     
     \uncover<10->{\begin{quote}
-    	Performance isn't everything, but without performance everything is worth nothing.
+       	\small \noindent Performance isn't everything, but without it, everything else is nothing.
     \end{quote}}
     
     \begin{itemize}
@@ -38,7 +38,7 @@
     
 \end{frame}
 
- \begin{frame}
+\begin{frame}
 	\frametitle{Some Implications of those Requirements}
 
 	\begin{itemize}
@@ -51,7 +51,7 @@
 				\uncover<7->{\item[$\rightarrow$] Interleaved transaction execution to exploit abundant thread-level parallelism without violating the ACID properties!}
 				\uncover<8->{\item[$\rightarrow$] Interleaved operation execution to exploit intra-transaction parallelism!}
 			\end{itemize}
-		\uncover<8->{\item[$\rightarrow$] physical \& pogical Synchronization}
+		\uncover<8->{\item[$\rightarrow$] physical \& logical Synchronization}
 		\uncover<9->{\item[\textcolor{red}{\bm{$\rightarrow$}}] \textcolor{red}{\textbf{Limits concurrency for high-contention workloads!}}}
 	\end{itemize}
 \end{frame}
