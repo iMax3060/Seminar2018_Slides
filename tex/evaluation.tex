@@ -80,14 +80,14 @@
 	\frametitle{Evaluation Set-Up}
 	
 	\begin{itemize}
-		\visible<2->{\item	4x Intel Xeon E7-8890 v3 NUMA machine (72 cores @ \SI{2.5}{\giga\hertz})}
-		\visible<2->{\item	\SI{32}{\kilo\byte} L1I cache and \SI{32}{\kilo\byte} L1D cache per core}
-		\visible<2->{\item	\SI{256}{\kilo\byte} L2 cache per core}
-		\visible<2->{\item	\SI{45}{\mega\byte} L3 cache per CPU}
-		\visible<3->{\item	\SI{512}{\giga\byte} DDR4 RAM}
-		\visible<4->{\item	hyperThreading not used}
-		\visible<4->{\item	threads pinned to physical cores}
-		\visible<4->{\item	sockets filled sequentially with threads}
+		\item	4x Intel Xeon E7-8890 v3 NUMA machine (72 cores @ \SI{2.5}{\giga\hertz})
+		\item	\SI{32}{\kilo\byte} L1I cache and \SI{32}{\kilo\byte} L1D cache per core
+		\item	\SI{256}{\kilo\byte} L2 cache per core
+		\item	\SI{45}{\mega\byte} L3 cache per CPU
+		\item	\SI{512}{\giga\byte} DDR4 RAM
+		\item	hyperThreading not used
+		\item	threads pinned to physical cores
+		\item	sockets filled sequentially with threads
 	\end{itemize}
 \end{frame}
 
@@ -717,13 +717,13 @@
 	\frametitle{Conclusion I}
 
 	\begin{itemize}
-		\visible<2->{\item	optimistic concurrency control scales better than pessimistic CC for most workloads}
-		\visible<3->{\item	optimistic CC suffers from large record sizes}
-		\visible<4->{\item	atomic operations scale better than latches}
-		\visible<5->{\item	partitioning makes latches scalable}
-		\visible<6->{\item	2PL does not scale for mixed workloads}
-		\visible<7->{\item	partitioning DB architectures perform bad under partition-unfriendly workloads}
-		\visible<8->{\item	partitioning DB architectures perform bad under multi-sited transactions}
+		\item	optimistic concurrency control scales better than pessimistic CC for most workloads
+		\item	optimistic CC suffers from large record sizes
+		\item	atomic operations scale better than latches
+		\item	partitioning makes latches scalable
+		\item	2PL does not scale for mixed workloads
+		\item	partitioning DB architectures perform bad under partition-unfriendly workloads
+		\item	partitioning DB architectures perform bad under multi-sited transactions
 	\end{itemize}
 \end{frame}
 
@@ -731,10 +731,10 @@
 	\frametitle{Conclusion II}
 
 	\begin{itemize}
-		\visible<2->{\item	the transaction throughput decreases by an order of magnitude for update-only instead of read-only workloads (PSE is insensitive to writes) \\ \bm{$\rightarrow$} PSE scales best for update-intensive workloads}
-		\visible<3->{\item	PSE does not scale for read-intensive high-contention workloads with small hot sets}
-		\visible<4->{\item[$\rightarrow$]	None of the architectures or CC protocols outperform the others for any workload!}
-		\visible<5->{\item[$\rightarrow$]	Every architecture and CC protocol performs very bad for some specific workload!}
+		\item	the transaction throughput decreases by an order of magnitude for update-only instead of read-only workloads (PSE is insensitive to writes) \\ \bm{$\rightarrow$} PSE scales best for update-intensive workloads
+		\item	PSE does not scale for read-intensive high-contention workloads with small hot sets
+		\item[$\rightarrow$]	None of the architectures or CC protocols outperform the others for any workload!
+		\item[$\rightarrow$]	Every architecture and CC protocol performs very bad for some specific workload!
 	\end{itemize}
 \end{frame}
 
@@ -744,9 +744,9 @@
 	\frametitle{Discussion of the Performance Evaluation}
 
 	\begin{itemize}
-		\visible<2->{\item	read-only and update-only workload are not appropriate to evaluate concurrency control algorithms}
-		\visible<3->{\item	partition-unfriendly workloads are not appropriate to evaluate database architectures that use partitioning}
-		\visible<4->{\item	neither the microbenchmark nor YCSB are OLTP benchmarks}
-		\visible<5->{\item[$\rightarrow$]	The authors did not properly analyze the combination of database architecture and concurrency control algorithm for OLTP workloads!}
+		\item	read-only and update-only workload are not appropriate to evaluate concurrency control algorithms
+		\item	partition-unfriendly workloads are not appropriate to evaluate database architectures that use partitioning
+		\item	neither the microbenchmark nor YCSB are OLTP benchmarks
+		\item[$\rightarrow$]	The authors did not properly analyze the combination of database architecture and concurrency control algorithm for OLTP workloads!
 	\end{itemize}
 \end{frame}

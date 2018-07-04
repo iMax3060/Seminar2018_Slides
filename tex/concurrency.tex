@@ -38,24 +38,22 @@
 	\frametitle{Properties of \lstinline{DL\_DETECT} (2PL)}
 	
 	\begin{itemize}
-		\visible<2->{\item	pessimistic concurrency control protocol}
-		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them	\cite{Mohan:1990}}
-		\visible<5->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
-		\visible<6->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases lock}
-		\visible<7->{\item	deadlock detection using a repeatedly generated and analyzed wait-for graph}
+		\item	pessimistic concurrency control protocol
+		\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$) or updating (exclusive mode $X$) them	\cite{Mohan:1990}
+		\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)
+		\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases lock
+		\item	deadlock detection using a repeatedly generated and analyzed wait-for graph
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<3->{%
-		\centering
-		\begin{tabular}{| c | c | c |}
-																\hline
-			compatibility	&	shared mode	&	exclusive mode		\\	\hline
-			shared mode	&	\plus			&	\minus			\\	\hline
-			exclusive mode	&	\minus		&	\minus			\\	\hline
-		\end{tabular}%
-	}
+	\centering
+	\begin{tabular}{| c | c | c |}
+															\hline
+		compatibility	&	shared mode	&	exclusive mode		\\	\hline
+		shared mode	&	\plus			&	\minus			\\	\hline
+		exclusive mode	&	\minus		&	\minus			\\	\hline
+	\end{tabular}%
 \end{frame}
 
 \begin{frame}[fragile]
@@ -206,13 +204,13 @@
 	\frametitle{Pros \& Cons of \lstinline{DL\_DETECT} (2PL)}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	aborts only after deadlocks}
-		\visible<3->{\item[$-$]	deadlocks are possible}
-		\visible<4->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
-		\visible<5->{\item[$-$]	calculation and analysis of wait-for graph expensive \\ \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
-		\visible<6->{\item[$-$]	aborts happen \\ \bm{$\rightarrow$} work done before needs to be repeated}
-		\visible<7->{\item[$-$]	queue of waiters requires latching \\ \bm{$\rightarrow$} limits scalability}
-		\visible<8->{\item[$-$]	even writes need to acquire latches and wait}
+		\visible<1->{\item[$+$]	aborts only after deadlocks}
+		\visible<2->{\item[$-$]	deadlocks are possible}
+		\visible<2->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
+		\visible<2->{\item[$-$]	calculation and analysis of wait-for graph expensive \\ \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
+		\visible<2->{\item[$-$]	aborts happen \\ \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<2->{\item[$-$]	queue of waiters requires latching \\ \bm{$\rightarrow$} limits scalability}
+		\visible<2->{\item[$-$]	even writes need to acquire latches and wait}
 	\end{itemize}
 \end{frame}
 
@@ -238,23 +236,21 @@
 	\frametitle{Properties of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
 	
 	\begin{itemize}
-		\visible<2->{\item	pessimistic concurrency control protocol}
-		\visible<3->{\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$)}\visible<4->{ or updating (exclusive mode $X$) them	\cite{Mohan:1990}}
-		\visible<5->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
-		\visible<6->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts}
+		\item	pessimistic concurrency control protocol
+		\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$) or updating (exclusive mode $X$) them	\cite{Mohan:1990}
+		\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)
+		\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<3->{%
-		\centering
-		\begin{tabular}{| c | c | c |}
-																\hline
-			compatibility	&	shared mode	&	exclusive mode		\\	\hline
-			shared mode	&	\plus			&	\minus			\\	\hline
-			exclusive mode	&	\minus		&	\minus			\\	\hline
-		\end{tabular}%
-	}
+	\centering
+	\begin{tabular}{| c | c | c |}
+															\hline
+		compatibility	&	shared mode	&	exclusive mode		\\	\hline
+		shared mode	&	\plus			&	\minus			\\	\hline
+		exclusive mode	&	\minus		&	\minus			\\	\hline
+	\end{tabular}%
 \end{frame}
 
 \begin{frame}[fragile]
@@ -389,11 +385,11 @@
 	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	deadlocks are impossible}
-		\visible<3->{\item[$+$]	locks can be implemented using a semaphore and atomics \\ \bm{$\rightarrow$} scales better than latches}
-		\visible<4->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
-		\visible<5->{\item[$-$]	many lock conflicts for update-intensive high-contention workloads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
-		\visible<6->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
+		\visible<1->{\item[$+$]	deadlocks are impossible}
+		\visible<1->{\item[$+$]	locks can be implemented using a semaphore and atomics \\ \bm{$\rightarrow$} scales better than latches}
+		\visible<1->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
+		\visible<2->{\item[$-$]	many lock conflicts for update-intensive high-contention workloads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<2->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
 	\end{itemize}
 \end{frame}
 
@@ -419,11 +415,11 @@
 	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two-Version-2PL) I}
 	
 	\begin{itemize}
-		\visible<2->{\item	multiversion pessimistic concurrency control protocol}
-		\visible<3->{\item	3 phases: read, certify, write/commit}
-		\visible<4->{\item	transactions lock records before reading (shared mode $S$)}\visible<5->{, privately updating (exclusive mode $X$)}\visible<6->{ or certifying/globally updating (certify mode $C$) them}
-		\visible<7->{\item	updates happen first on a private copy \\ \bm{$\rightarrow$} committed copy can still be read by other transactions}
-		\visible<8->{\item	before committing writes (replace original record with private copy) the absence of relevant conflicts needs to be certified (certification step)}
+		\item	multiversion pessimistic concurrency control protocol
+		\item	3 phases: read, certify, write/commit
+		\item	transactions lock records before reading (shared mode $S$), privately updating (exclusive mode $X$) or certifying/globally updating (certify mode $C$) them
+		\item	updates happen first on a private copy \\ \bm{$\rightarrow$} committed copy can still be read by other transactions
+		\item	before committing writes (replace original record with private copy) the absence of relevant conflicts needs to be certified (certification step)
 	\end{itemize}
 \end{frame}
 
@@ -431,51 +427,49 @@
 	\frametitle{Properties of \lstinline{2V\_NO\_WAIT} (Two-Version-2PL) II}
 	
 	\begin{itemize}
-		\visible<2->{\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)}
-		\visible<3->{\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts}
+		\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)
+		\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ aborts
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
 	
-	\visible<2->{%
-		\centering
-		\begin{tabular}{| c | c | c | c |}
-																			\hline
-			compatibility	&	shared mode	&	exclusive mode	&	certify mode	\\	\hline
-			shared mode	&	\plus			&	\plus			&	\minus		\\	\hline
-			exclusive mode	&	\plus			&	\minus		&	\minus		\\	\hline
-			certify mode	&	\minus		&	\minus		&	\minus		\\	\hline
-		\end{tabular}%
-	}
+	\centering
+	\begin{tabular}{| c | c | c | c |}
+																		\hline
+		compatibility	&	shared mode	&	exclusive mode	&	certify mode	\\	\hline
+		shared mode	&	\plus			&	\plus			&	\minus		\\	\hline
+		exclusive mode	&	\plus			&	\minus		&	\minus		\\	\hline
+		certify mode	&	\minus		&	\minus		&	\minus		\\	\hline
+	\end{tabular}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Protocol I}
 	
 	\begin{itemize}
-		\visible<2->{\item[\textbf{read $r_i$}]	\hfill}
+		\item[\textbf{read $r_i$}]	\hfill
 							\begin{itemize}
-								\visible<3->{\item[$C$ acquired]	$r_i$ gets certified or committed by another transaction}
+								\item[$C$ acquired]	$r_i$ gets certified or committed by another transaction
 															\begin{itemize}
-																\visible<4->{\item	\textcolor{red}{abort} this transaction}
+																\item	\textcolor{red}{abort} this transaction
 															\end{itemize}
-								\visible<5->{\item[$C$ not acquired]	other threads might read $r_i$ or privately update $r_i$}
+								\item[$C$ not acquired]	other threads might read $r_i$ or privately update $r_i$
 															\begin{itemize}
-																\visible<6->{\item	acquire $r_i$'s lock in $S$ mode}
-																\visible<7->{\item	read global (committed) value of $r_i$}
+																\item	acquire $r_i$'s lock in $S$ mode
+																\item	read global (committed) value of $r_i$
 															\end{itemize}
 							\end{itemize}
-		\visible<8->{\item[\textbf{update $r_i$}]	\hfill}
+		\item[\textbf{update $r_i$}]	\hfill
 							\begin{itemize}
-								\visible<9->{\item[$W$ acquired]	$r_i$ gets (privately or globally) updated by another transaction \\ \bm{$\rightarrow$} there are already two versions}
+								\item[$W$ acquired]	$r_i$ gets (privately or globally) updated by another transaction \\ \bm{$\rightarrow$} there are already two versions
 															\begin{itemize}
-																\visible<10->{\item	\textcolor{red}{abort} this transaction}
+																\item	\textcolor{red}{abort} this transaction
 															\end{itemize}
-								\visible<11->{\item[$W$ not acquired]	other threads at most read $r_i$}
+								\item[$W$ not acquired]	other threads at most read $r_i$
 															\begin{itemize}
-																\visible<12->{\item	acquire $r_i$'s lock in $X$ mode}
-																\visible<13->{\item	create local copy of global (committed) value of $r_i$}
-																\visible<14->{\item	update local copy of $r_i$}
+																\item	acquire $r_i$'s lock in $X$ mode
+																\item	create local copy of global (committed) value of $r_i$
+																\item	update local copy of $r_i$
 															\end{itemize}
 							\end{itemize}
 	\end{itemize}
@@ -485,21 +479,21 @@
 	\frametitle{Protocol II}
 	
 	\begin{itemize}
-		\visible<2->{\item[\textbf{certify $r_i$}]	\textit{(only if $r_i$ was updated)}}
+		\item[\textbf{certify $r_i$}]	\textit{(only if $r_i$ was updated)}
 							\begin{itemize}
-								\visible<3->{\item[$S$ acquired]	$r_i$'s global (committed) value gets read by other transaction \\ \bm{$\rightarrow$} globally updating $r_i$ would cause non-repeatable reads}
+								\item[$S$ acquired]	$r_i$'s global (committed) value gets read by other transaction \\ \bm{$\rightarrow$} globally updating $r_i$ would cause non-repeatable reads
 															\begin{itemize}
-																\visible<4->{\item	\textcolor{red}{abort} this transaction}
+																\item	\textcolor{red}{abort} this transaction
 															\end{itemize}
-								\visible<5->{\item[$S$ not acquired]	other threads at most read $r_i$}
+								\item[$S$ not acquired]	other threads at most read $r_i$
 															\begin{itemize}
-																\visible<6->{\item	acquire $r_i$'s lock in $C$ mode}
+																\item	acquire $r_i$'s lock in $C$ mode
 															\end{itemize}
 							\end{itemize}
-		\visible<7->{\item[\textbf{commit}]	\hfill}
+		\item[\textbf{commit}]	\hfill
 							\begin{itemize}
-								\visible<8->{\item	\textit{(only if $r_i$ was updated)} replace global $r_i$ with updated local version}
-								\visible<9->{\item	release the locks held on $r_i$}
+								\item	\textit{(only if $r_i$ was updated)} replace global $r_i$ with updated local version
+								\item	release the locks held on $r_i$
 							\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -508,16 +502,16 @@
 	\frametitle{Pros \& Cons \lstinline{2V\_NO\_WAIT} (Two-Version-2PL)}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	deadlocks are impossible}
-		\visible<3->{\item[$+$]	transactions can read while a transaction updates a record}
-		\visible<4->{\item[$+$]	locks can be implemented using a semaphore and a flag updated with atomic instructions \\ \bm{$\rightarrow$} scales better than latches}
-		\visible<5->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
-		\visible<6->{\item[$-$]	update-intensive high-contention workloads result in many lock conflicts \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
-		\visible<7->{\item[$-$]	locks still prevent concurrency too often (e.g. blind writes)}
-		\visible<8->{\item[$-$]	additional steps for updates required:}
+		\visible<1->{\item[$+$]	deadlocks are impossible}
+		\visible<1->{\item[$+$]	transactions can read while a transaction updates a record}
+		\visible<1->{\item[$+$]	locks can be implemented using a semaphore and a flag updated with atomic instructions \\ \bm{$\rightarrow$} scales better than latches}
+		\visible<1->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
+		\visible<2->{\item[$-$]	update-intensive high-contention workloads result in many lock conflicts \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<2->{\item[$-$]	locks still prevent concurrency too often (e.g. blind writes)}
+		\visible<2->{\item[$-$]	additional steps for updates required:}
 							\begin{itemize}
-								\visible<9->{\item	create private copy of updated record (expensive but scalable)}
-								\visible<10->{\item	certify update (cheap)}
+								\visible<2->{\item	create private copy of updated record (expensive but scalable)}
+								\visible<2->{\item	certify update (cheap)}
 							\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -544,10 +538,10 @@
 	\frametitle{Properties of \lstinline{SILO} (OCC) I}
 	
 	\begin{itemize}
-		\visible<2->{\item	optimistic concurrency control protocol}
-		\visible<3->{\item	3 phases: read, validate, write/commit}
-		\visible<3->{\item	each record contains the transaction ID (global ordered number based on epochs) from the last update}
-		\visible<4->{\item	transactions perform reads and local writes during the read phase without acquiring locks}
+		\item	optimistic concurrency control protocol
+		\item	3 phases: read, validate, write/commit
+		\item	each record contains the transaction ID (global ordered number based on epochs) from the last update
+		\item	transactions perform reads and local writes during the read phase without acquiring locks
 	\end{itemize}
 \end{frame}
 
@@ -555,11 +549,11 @@
 	\frametitle{Properties of \lstinline{SILO} (OCC) II}
 	
 	\begin{itemize}
-		\visible<2->{\item	read and write sets (records read and written by the transaction) are recorded locally}
-		\visible<3->{\item	read and write sets used to validate absence of relevant conflicts}
-		\visible<4->{\item	commit requires three phases: locking of updated records, verification of read set (based on TIDs), execute global writes}
-		\visible<5->{\item	deletes invalidate records using updates \\ \bm{$\rightarrow$} garbage collection required}
-		\visible<6->{\item	records for inserts created before validation to provide locks}
+		\item	read and write sets (records read and written by the transaction) are recorded locally
+		\item	read and write sets used to validate absence of relevant conflicts
+		\item	commit requires three phases: locking of updated records, verification of read set (based on TIDs), execute global writes
+		\item	deletes invalidate records using updates \\ \bm{$\rightarrow$} garbage collection required
+		\item	records for inserts created before validation to provide locks
 	\end{itemize}
 \end{frame}
 
@@ -567,15 +561,15 @@
 	\frametitle{Pros \& Cons \lstinline{SILO} (OCC)}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	deadlocks are impossible (locks acquired only in last phase \bm{$\rightarrow$} global order can be used)}
-		\visible<3->{\item[$+$]	transactions can concurrently read and write}
-		\visible<4->{\item[$+$]	only actual conflicts cause aborts (optimism)}
-		\visible<5->{\item[$-$]	update-intensive high-contention workloads result in many invalid reads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
-		\visible<6->{\item[$-$]	globally sorted transaction IDs need to be generated (epochs make that cheap)}
-		\visible<7->{\item[$-$]	additional steps for updating transactions required:}
+		\visible<1->{\item[$+$]	deadlocks are impossible (locks acquired only in last phase \bm{$\rightarrow$} global order can be used)}
+		\visible<1->{\item[$+$]	transactions can concurrently read and write}
+		\visible<1->{\item[$+$]	only actual conflicts cause aborts (optimism)}
+		\visible<2->{\item[$-$]	update-intensive high-contention workloads result in many invalid reads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<2->{\item[$-$]	globally sorted transaction IDs need to be generated (epochs make that cheap)}
+		\visible<2->{\item[$-$]	additional steps for updating transactions required:}
 							\begin{itemize}
-								\visible<8->{\item	write and read sets locally (expensive but scalable)}
-								\visible<9->{\item	validate reads}
+								\visible<2->{\item	write and read sets locally (expensive but scalable)}
+								\visible<2->{\item	validate reads}
 							\end{itemize}
 	\end{itemize}
 \end{frame}

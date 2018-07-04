@@ -43,12 +43,12 @@
 	\frametitle{Properties of SE/NP}
 	
 	\begin{itemize}
-		\visible<2->{\item	metadata (incl. locks) are not partitioned}
-		\visible<3->{\item[$\rightarrow$]	physical synchronization (latches, atomics) required}
-		\visible<4->{\item	data and indices are not partitioned}
-		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol also required}
-		\visible<6->{\item	transactions completely executed by one thread}
-		\visible<6->{\item	thread-assignment depends only on load}
+		\item	metadata (incl. locks) are not partitioned
+		\item[$\rightarrow$]	physical synchronization (latches, atomics) required
+		\item	data and indices are not partitioned
+		\item[$\rightarrow$]	logical synchronization using a concurrency control protocol also required
+		\item	transactions completely executed by one thread
+		\item	thread-assignment depends only on load
 	\end{itemize}
 \end{frame}
 
@@ -56,15 +56,15 @@
 	\frametitle{Pros \& Cons of SE/NP}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	no partitioning required (e.g. manual selection of a strategy)}
-		\visible<3->{\item[$+$]	partitioning would be sensitive to the workload}
-		\visible<4->{\item[$+$]	changed workloads would require repartitioning to benefit from partitioning}
-		\visible<5->{\item[$-$]	each thread might access every record at arbitrary times}
+		\visible<1->{\item[$+$]	no partitioning required (e.g. manual selection of a strategy)}
+		\visible<1->{\item[$+$]	partitioning would be sensitive to the workload}
+		\visible<1->{\item[$+$]	changed workloads would require repartitioning to benefit from partitioning}
+		\visible<2->{\item[$-$]	each thread might access every record at arbitrary times}
 			\begin{itemize}
-				\visible<17->{\item[$-$]	each CPU cache may contain any part of the data \\ \bm{$\rightarrow$} cache pollution}
-				\visible<19->{\item[$-$]	each CPU may access any part of the data \\ \bm{$\rightarrow$} data movement between NUMA regions}
-				\visible<21->{\item[$-$]	each CPU may acquire any latch \\ \bm{$\rightarrow$} data movement between NUMA regions}
-				\visible<22->{\item[$-$]	each CPU may atomically write to any semaphore \\ \bm{$\rightarrow$} hardware cache coherence overhead}
+				\visible<2->{\item[$-$]	each CPU cache may contain any part of the data \\ \bm{$\rightarrow$} cache pollution}
+				\visible<2->{\item[$-$]	each CPU may access any part of the data \\ \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<2->{\item[$-$]	each CPU may acquire any latch \\ \bm{$\rightarrow$} data movement between NUMA regions}
+				\visible<2->{\item[$-$]	each CPU may atomically write to any semaphore \\ \bm{$\rightarrow$} hardware cache coherence overhead}
 			\end{itemize}
 	\end{itemize}
     
@@ -76,7 +76,7 @@
 	}
 
 	\begin{tikzpicture}[remember picture, overlay]
-		\node[visible on = <6-16>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+		\node[visible on = <3-13>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
@@ -99,21 +99,21 @@
 							  height = .95\textheight,
 							  axis on top = true,
 							  title = {Record Accesses of Conventional DB Threads (\cite{Pandis:2010})}]		
-						\addplot[visible on = <7->, only marks, mark = x, draw = black] table {data/record_accesses_per_thread_conventional_0.csv};
-						\addplot[visible on = <8->, only marks, mark = x, draw = cyan] table {data/record_accesses_per_thread_conventional_1.csv};
-						\addplot[visible on = <9->, only marks, mark = x, draw = red] table {data/record_accesses_per_thread_conventional_2.csv};
-						\addplot[visible on = <10->, only marks, mark = x, draw = green] table {data/record_accesses_per_thread_conventional_3.csv};
-						\addplot[visible on = <11->, only marks, mark = x, draw = blue] table {data/record_accesses_per_thread_conventional_4.csv};
-						\addplot[visible on = <12->, only marks, mark = x, draw = black!50] table {data/record_accesses_per_thread_conventional_5.csv};
-						\addplot[visible on = <13->, only marks, mark = x, draw = cyan!50] table {data/record_accesses_per_thread_conventional_6.csv};
-						\addplot[visible on = <14->, only marks, mark = x, draw = red!50] table {data/record_accesses_per_thread_conventional_7.csv};
-						\addplot[visible on = <15->, only marks, mark = x, draw = green!50] table {data/record_accesses_per_thread_conventional_8.csv};
-						\addplot[visible on = <16->, only marks, mark = x, draw = blue!50] table {data/record_accesses_per_thread_conventional_9.csv};
+						\addplot[visible on = <4->, only marks, mark = x, draw = black] table {data/record_accesses_per_thread_conventional_0.csv};
+						\addplot[visible on = <5->, only marks, mark = x, draw = cyan] table {data/record_accesses_per_thread_conventional_1.csv};
+						\addplot[visible on = <6->, only marks, mark = x, draw = red] table {data/record_accesses_per_thread_conventional_2.csv};
+						\addplot[visible on = <7->, only marks, mark = x, draw = green] table {data/record_accesses_per_thread_conventional_3.csv};
+						\addplot[visible on = <8->, only marks, mark = x, draw = blue] table {data/record_accesses_per_thread_conventional_4.csv};
+						\addplot[visible on = <9->, only marks, mark = x, draw = black!50] table {data/record_accesses_per_thread_conventional_5.csv};
+						\addplot[visible on = <10->, only marks, mark = x, draw = cyan!50] table {data/record_accesses_per_thread_conventional_6.csv};
+						\addplot[visible on = <11->, only marks, mark = x, draw = red!50] table {data/record_accesses_per_thread_conventional_7.csv};
+						\addplot[visible on = <12->, only marks, mark = x, draw = green!50] table {data/record_accesses_per_thread_conventional_8.csv};
+						\addplot[visible on = <13->, only marks, mark = x, draw = blue!50] table {data/record_accesses_per_thread_conventional_9.csv};
 					\end{axis}
 				\end{tikzpicture}%
 			\end{adjustbox}%
     												   };
-		\node[visible on = <18>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+		\node[visible on = <15>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}
 				\begin{tikzpicture}[]
 							% Center points of the baseline of each pyramid layer (0: Peak of the pyramid; 1: Center of the baseline of the top layer; ...)
@@ -257,7 +257,7 @@
 				\end{tikzpicture}
 			\end{adjustbox}
     												   };
-		\node[visible on = <20>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+		\node[visible on = <17>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[major x tick style = transparent,
@@ -316,12 +316,12 @@
 	\frametitle{Properties of DORA}
 	
 	\begin{itemize}
-		\visible<2->{\item	metadata (incl. locks) are physically partitioned}
-		\visible<3->{\item[$\rightarrow$]	no physical synchronization (latches, atomics) required}
-		\visible<4->{\item	data and indices are logically partitioned}
-		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required}
-		\visible<6->{\item	threads are assigned to data}
-		\visible<6->{\item	transactions migrate to threads owning the accessed data}
+		\item	metadata (incl. locks) are physically partitioned
+		\item[$\rightarrow$]	no physical synchronization (latches, atomics) required
+		\item	data and indices are logically partitioned
+		\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required
+		\item	threads are assigned to data
+		\item	transactions migrate to threads owning the accessed data
 	\end{itemize}
 \end{frame}
 
@@ -481,18 +481,18 @@
 	\frametitle{Pros of DORA}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	each thread accesses only the records of its partition}
+		\item[$+$]	each thread accesses only the records of its partition
 			\begin{itemize}
-				\visible<4->{\item[$+$]	each CPU cache may contain only data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
-				\visible<5->{\item[$+$]	each CPU may access only data of its partitions \\ \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)}
-				\visible<6->{\item[$\rightarrow$]	No physical synchronization required!}
+				\item[$+$]	each CPU cache may contain only data of its partition \\ \bm{$\rightarrow$} lower cache pollution
+				\item[$+$]	each CPU may access only data of its partitions \\ \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)
+				\item[$\rightarrow$]	No physical synchronization required!
 			\end{itemize}
-		\visible<7->{\item[$+$]	logical partitioning allows fast repartitioning when the workload changes}
-		\visible<8->{\item[$+$]	intra-transaction parallelism could be exploited for multi-site transactions}
+		\item[$+$]	logical partitioning allows fast repartitioning when the workload changes
+		\item[$+$]	intra-transaction parallelism could be exploited for multi-site transactions
 	\end{itemize}
 	
 	\begin{tikzpicture}[remember picture, overlay]
-		\node[visible on = <3>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
+		\node[visible on = <2>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
 					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
@@ -536,12 +536,12 @@
 	\frametitle{Cons of DORA}
 	
 	\begin{itemize}
-		\visible<2->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
-		\visible<3->{\item[$-$]	partitioning is sensitive to the workload}
-		\visible<4->{\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)}
-		\visible<5->{\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \\ \bm{$\rightarrow$} slower accesses with secondary index}
-		\visible<6->{\item[$-$]	primary index is shared \\ \bm{$\rightarrow$} centralized latching for inserts/\-deletes still required \\ \bm{$\rightarrow$} some contention on the shared latch}
-		\visible<7->{\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})}
+		\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})
+		\item[$-$]	partitioning is sensitive to the workload
+		\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)
+		\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \\ \bm{$\rightarrow$} slower accesses with secondary index
+		\item[$-$]	primary index is shared \\ \bm{$\rightarrow$} centralized latching for inserts/\-deletes still required \\ \bm{$\rightarrow$} some contention on the shared latch
+		\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})
 	\end{itemize}
 \end{frame}
 
@@ -573,15 +573,15 @@
 	\frametitle{Properties of Delegation}
 	
 	\begin{itemize}
-		\visible<2->{\item	metadata (incl. locks) are physically partitioned}
-		\visible<3->{\item[$\rightarrow$]	no physical synchronization (latches, atomics) required}
-		\visible<4->{\item	data and indices are physically partitioned}
-		\visible<5->{\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required}
-		\visible<6->{\item	transactions completely executed by one thread (ideally the one owning the majority of the records)}
-		\visible<7->{\item	thread accesses remote records by passing messages to the threads owning them}
+		\item	metadata (incl. locks) are physically partitioned
+		\item[$\rightarrow$]	no physical synchronization (latches, atomics) required
+		\item	data and indices are physically partitioned
+		\item[$\rightarrow$]	logical synchronization using a concurrency control protocol only locally required
+		\item	transactions completely executed by one thread (ideally the one owning the majority of the records)
+		\item	thread accesses remote records by passing messages to the threads owning them
 						\begin{itemize}
-							\visible<8->{\item	message passing implemented using shared variables}
-							\visible<9->{\item	remote records are passed as pointers}
+							\item	message passing implemented using shared variables
+							\item	remote records are passed as pointers
 						\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -718,16 +718,16 @@
 	\frametitle{Pros \& Cons of Delegation}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
+		\visible<1->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
 			\begin{itemize}
-				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
-				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions}
-				\visible<5->{\item[$\rightarrow$]	No physical synchronization required!}
+				\visible<1->{\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
+				\visible<1->{\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions}
+				\visible<1->{\item[$\rightarrow$]	No physical synchronization required!}
 			\end{itemize}
-		\visible<6->{\item[$+$]	message-passing required for multi-site transactions imposes only a low overhead}
-		\visible<7->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
-		\visible<8->{\item[$-$]	partitioning is sensitive to the workload}
-		\visible<9->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
+		\visible<1->{\item[$+$]	message-passing required for multi-site transactions imposes only a low overhead}
+		\visible<2->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
+		\visible<2->{\item[$-$]	partitioning is sensitive to the workload}
+		\visible<2->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
 	\end{itemize}
 \end{frame}
 
@@ -759,11 +759,11 @@
 	\frametitle{Properties of PSE}
 	
 	\begin{itemize}
-		\visible<2->{\item	data and associated metadata are physically partitioned \\ \bm{$\rightarrow$} Shared-Nothing}
-		\visible<3->{\item	partition-level locking using latches (only exclusive mode)}
-		\visible<4->{\item[$\rightarrow$]	No concurrency control algorithm required!}
-		\visible<5->{\item	single-site transactions run serially on the partition's thread (partition needs to be locked)}
-		\visible<6->{\item	multi-site transactions require upfront to lock of all relevant partitions/coordination between threads}
+		\item	data and associated metadata are physically partitioned \\ \bm{$\rightarrow$} Shared-Nothing
+		\item	partition-level locking using latches (only exclusive mode)
+		\item[$\rightarrow$]	No concurrency control algorithm required!
+		\item	single-site transactions run serially on the partition's thread (partition needs to be locked)
+		\item	multi-site transactions require upfront to lock of all relevant partitions/coordination between threads
 	\end{itemize}
 \end{frame}
 
@@ -771,14 +771,14 @@
 	\frametitle{Pros of PSE}
 	
 	\begin{itemize}
-		\visible<2->{\item[$+$]	only multi-site transactions cause a thread to access unowned records}
+		\item[$+$]	only multi-site transactions cause a thread to access unowned records
 			\begin{itemize}
-				\visible<3->{\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution}
-				\visible<3->{\item[$+$]	partition-lock is usually in the CPU cache \\ \bm{$\rightarrow$} synchronization imposes minor overhead}
-				\visible<4->{\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions}
-				\visible<5->{\item[$\rightarrow$]	no physical synchronization beyond the partition-lock required}
+				\item[$+$]	each CPU cache usually only contains data of its partition \\ \bm{$\rightarrow$} lower cache pollution
+				\item[$+$]	partition-lock is usually in the CPU cache \\ \bm{$\rightarrow$} synchronization imposes minor overhead
+				\item[$+$]	each CPU usually only accesses data of its partitions \\ \bm{$\rightarrow$} fewer data movement between NUMA regions
+				\item[$\rightarrow$]	no physical synchronization beyond the partition-lock required
 			\end{itemize}
-		\visible<6->{\item[$\rightarrow$]	scales linearly for single-site transactions}
+		\item[$\rightarrow$]	scales linearly for single-site transactions
 	\end{itemize}
 \end{frame}
 
@@ -786,11 +786,11 @@
 	\frametitle{Cons of PSE}
 	
 	\begin{itemize}
-		\visible<2->{\item[$-$]	multi-site transactions require locking of all relevant partitions \\ \bm{$\rightarrow$} decreases concurrency drastically}
-		\visible<3->{\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})}
-		\visible<4->{\item[$-$]	partitioning is sensitive to the workload}
-		\visible<5->{\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes}
-		\visible<6->{\item[$-$]	coordination of multi-site transactions required}
+		\item[$-$]	multi-site transactions require locking of all relevant partitions \\ \bm{$\rightarrow$} decreases concurrency drastically
+		\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})
+		\item[$-$]	partitioning is sensitive to the workload
+		\item[$-$]	physical partitioning requires expensive repartitioning when the workload changes
+		\item[$-$]	coordination of multi-site transactions required
 	\end{itemize}
 \end{frame}
 

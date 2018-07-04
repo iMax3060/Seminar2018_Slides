@@ -9,30 +9,30 @@
     \frametitle{Requirements for a DBMS}
     
     \begin{itemize}
-    	\uncover<2->{\item Reliability}
+    	\item Reliability
               \begin{itemize}
-                  \uncover<4->{\item ACID Transactions}
-                  \uncover<5->{\item high availability}
-                  \uncover<6->{\item etc.}
+                  \item ACID Transactions
+                  \item high availability
+                  \item etc.
               \end{itemize}
-        \uncover<3->{\item Functionality}
+        \item Functionality
               \begin{itemize}
-                  \uncover<7->{\item simple to use programming model}
-                  \uncover<8->{\item simple to use API}
-                  \uncover<9->{\item etc.}
+                  \item simple to use programming model
+                  \item simple to use API
+                  \item etc.
               \end{itemize}
     \end{itemize}
     
-    \uncover<10->{\begin{quote}
+    \begin{quote}
        	\small \noindent Performance isn't everything, but without it, everything else is nothing.
-    \end{quote}}
+    \end{quote}
     
     \begin{itemize}
-    	\uncover<11->{\item Performance}
+    	\item Performance
         	  \begin{itemize}
-        	          \uncover<12->{\item high transaction throughput}
-                  \uncover<13->{\item low latency}
-                  \uncover<14->{\item etc.}
+        	          \item high transaction throughput
+                  \item low latency
+                  \item etc.
         	  \end{itemize}
     \end{itemize}
     
@@ -42,16 +42,16 @@
 	\frametitle{Some Implications of those Requirements}
 
 	\begin{itemize}
-		\uncover<2->{\item	work purely in-memory when the working set completely fits in main memory}
-		\uncover<3->{\item proper utilization of the computational resources is required}
+		\item	work purely in-memory when the working set completely fits in main memory
+		\item proper utilization of the computational resources is required
 			\begin{itemize}
-				\uncover<4->{\item available CPU time (usually not the bottleneck)}
-				\uncover<5->{\item available hardware contexts (simultaneous threads)}
-				\uncover<6->{\item Cache Oblivious Algorithms (e.g. partitioning Hash-JOINs)}
-				\uncover<7->{\item[$\rightarrow$] Interleaved transaction execution to exploit abundant thread-level parallelism without violating the ACID properties!}
-				\uncover<8->{\item[$\rightarrow$] Interleaved operation execution to exploit intra-transaction parallelism!}
+				\item available CPU time (usually not the bottleneck)
+				\item available hardware contexts (simultaneous threads)
+				\item Cache Oblivious Algorithms (e.g. partitioning Hash-JOINs)
+				\item[$\rightarrow$] Interleaved transaction execution to exploit abundant thread-level parallelism without violating the ACID properties!
+				\item[$\rightarrow$] Interleaved operation execution to exploit intra-transaction parallelism!
 			\end{itemize}
-		\uncover<8->{\item[$\rightarrow$] physical \& logical Synchronization}
-		\uncover<9->{\item[\textcolor{red}{\bm{$\rightarrow$}}] \textcolor{red}{\textbf{Limits concurrency for high-contention workloads!}}}
+		\item[$\rightarrow$] physical \& logical Synchronization
+		\uncover<2->{\item[\textcolor{red}{\bm{$\rightarrow$}}] \textcolor{red}{\textbf{Limits concurrency for high-contention workloads!}}}
 	\end{itemize}
 \end{frame}
