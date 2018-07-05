@@ -326,7 +326,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Example}
+	\frametitle{Interactive Example}
 	
 	\tikzset{
 		fiber/.style = {shape = rectangle},
@@ -590,12 +590,12 @@
 	\usebackgroundtemplate{%
 		\begin{minipage}[c]{\linewidth}
 		\vspace{5em}
-		\only<13->{\vspace{-2em}}
-		\only<14->{\vspace{-2em}}
-		\only<15->{\vspace{-1em}}
-		\only<16->{\vspace{-2em}}
-		\only<17->{\vspace{-2em}}
-		\only<18->{\vspace{-2em}}
+		\only<2->{\vspace{-2em}}
+		\only<3->{\vspace{-2em}}
+		\only<4->{\vspace{-1em}}
+		\only<5->{\vspace{-2em}}
+		\only<6->{\vspace{-2em}}
+		\only<7->{\vspace{-2em}}
 		\hspace{2em}
 		\resizebox{\linewidth}{!}{%
 			\begin{tikzpicture}
@@ -606,111 +606,111 @@
 					\umlobject[no ddots]		{Thread 0}
 					\umlobject[no ddots, /tikz/xshift = 2em]		{Thread 1}
 					
-					\only<2-18>{\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
-						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
-							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
-							\end{umlcall}}
-						\end{umlcall}}
-						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}]{Thread 0}{Thread 0}
-							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
-								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
-								\end{umlcall}}					
-								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
-								\end{umlcall}}
-								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
-								\end{umlcall}}
-							\end{umlcall}}
-						\end{umlcall}}
-					\end{umlcall}}
-					
-					\only<8-11>{\begin{umlcall}[op = {$BOT$}, dt = 31]{Application 1}{Thread 0}
-						\only<9->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<11->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
-						\end{umlcall}}
-					\end{umlcall}}
+%					\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
+%						\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+%							\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+%							\end{umlcall}
+%							\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+%							\end{umlcall}
+%							\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+%							\end{umlcall}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$commit\left(txn = 0\right)$}]{Thread 0}{Thread 0}
+%							\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+%								\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+%								\end{umlcall}					
+%								\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+%								\end{umlcall}
+%								\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+%								\end{umlcall}
+%							\end{umlcall}
+%						\end{umlcall}
+%					\end{umlcall}
+%					
+%					\begin{umlcall}[op = {$BOT$}, dt = 31]{Application 1}{Thread 0}
+%						\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%					\end{umlcall}
+%
+%					\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
+%						\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+%							\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+%							\end{umlcall}
+%							\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+%							\end{umlcall}
+%							\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+%							\end{umlcall}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+%						\end{umlcall}
+%						\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
+%							\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+%								\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+%								\end{umlcall}					
+%								\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+%								\end{umlcall}
+%								\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+%								\end{umlcall}
+%							\end{umlcall}
+%						\end{umlcall}
+%					\end{umlcall}
 
-					\only<19>{\begin{umlcall}[op = {$BOT$}]{Application 0}{Thread 0}
-						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
-							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
-							\end{umlcall}}
-						\end{umlcall}}
-						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
-							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
-								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
-								\end{umlcall}}					
-								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
-								\end{umlcall}}
-								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
-								\end{umlcall}}
-							\end{umlcall}}
-						\end{umlcall}}
-					\end{umlcall}}
+					\begin{umlcall}[op = {$BOT$}, return = {$EOT$}]{Application 0}{Thread 0}
+						\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}
+						\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
+						\end{umlcall}
+						\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
+							\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
+							\end{umlcall}
+							\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
+							\end{umlcall}
+							\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
+							\end{umlcall}
+						\end{umlcall}
+						\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
+						\end{umlcall}
+						\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
+							\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
+								\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
+								\end{umlcall}					
+								\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
+								\end{umlcall}
+								\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
+								\end{umlcall}
+							\end{umlcall}
+						\end{umlcall}
+					\end{umlcall}
 
-					\only<20>{\begin{umlcall}[op = {$BOT$}, return = {$EOT$}]{Application 0}{Thread 0}
-						\only<3->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<4->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 1\right)$}, return = {$x_1$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<5->{\begin{umlcall}[op = {$enqueue\left(read\left(0, 3\right)\right)$}, type = asynchron]{Thread 0}{Thread 1}
-							\only<6->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$read\left(txn = 0, RID = 3\right)$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<7->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 3\right)$}, return = {$x_3$}]{Thread 1}{Thread 1}
-							\end{umlcall}}
-							\only<10->{\begin{umlcall}[op = {$enqueue\left(x_3)\right)$}, type = asynchron]{Thread 1}{Thread 0}
-							\end{umlcall}}
-						\end{umlcall}}
-						\only<13->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$x_3$}, dt = 10]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<14->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 0}{Thread 0}
-							\only<15->{\begin{umlcall}[op = {$enqueue\left(commit\left(0\right)\right)$}, type = asynchron, return = {$enqueue\left(true\right)$}]{Thread 0}{Thread 1}
-								\only<16->{\begin{umlcall}[op = {$dequeue\left(\right)$}, return = {$commit\left(txn = 0\right)$}]{Thread 1}{Thread 1}
-								\end{umlcall}}					
-								\only<17->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}]{Thread 1}{Thread 1}
-								\end{umlcall}}
-								\only<18->{\begin{umlcall}[op = {$enqueue\left(true\right)$}, type = asynchron]{Thread 1}{Thread 0}
-								\end{umlcall}}
-							\end{umlcall}}
-						\end{umlcall}}
-					\end{umlcall}}
-
-					\only<12->{\begin{umlcall}[op = {$BOT$}, return = {$EOT$}, dt = 31]{Application 1}{Thread 0}
-						\only<9->{\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
-						\end{umlcall}}
-						\only<11->{\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
-						\end{umlcall}}
-					\end{umlcall}}
+					\begin{umlcall}[op = {$BOT$}, return = {$EOT$}, dt = 31]{Application 1}{Thread 0}
+						\begin{umlcall}[op = {$read\left(txn = 0, RID = 0\right)$}, return = {$x_0$}]{Thread 0}{Thread 0}
+						\end{umlcall}
+						\begin{umlcall}[op = {$commit\left(txn = 0\right)$}, return = {$true$}, dt = 5]{Thread 0}{Thread 0}
+						\end{umlcall}
+					\end{umlcall}
 				\end{umlseqdiag}
 				\node[draw = none]	at (17.5, 0)	{};
 			\end{tikzpicture}%
 		}
 		\end{minipage}
 	}
-	 \begin{frame}
+	\begin{frame}
 		\frametitle{\colorbox{white}{Example}}
 		
 		\only<2->{}
-		\only<20>{}
+		\only<7>{}
 	\end{frame}
 }
 
