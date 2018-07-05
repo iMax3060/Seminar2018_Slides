@@ -340,15 +340,15 @@
 			\begin{block}{Observations}
 				\only<3->{\begin{itemize}
 					\only<3-6>{\item	abort rate scales for \ref{label:dlDetect} due to higher contention \bm{$\rightarrow$} deadlocks}
-					\only<5-9>{\item	$\left[\si{\mega\transactions\per\second}\right]$ suffers from aborts and lock thrashing}
+					\only<5-9>{\item	$\left[\si{\mega\transactions\per\second}\right]$ suffers from \mbox{aborts and lock thrashing}}
 					\only<6-10>{\item	\ref{label:dora}/\ref{label:delegation} suffer more from remote data access overhead}
 					\only<7-10>{\item	latch contention is not the bottleneck \bm{$\rightarrow$} \ref{label:se} can outperform \ref{label:dora}/\ref{label:delegation}}
-					\only<10-13>{\item	lock thrashing does not cause many aborts for \ref{label:noWait} with \ref{label:se} for few threads}
+					\only<10-13>{\item	\mbox{lock thrashing does not} \mbox{cause many aborts for \ref{label:noWait}} \mbox{with \ref{label:se} for few threads}}
 					\only<11-15>{\item	lock thrashing caused by long commit latencies caused by overloaded (hot) partitions causes many aborts for \ref{label:dora}/\ref{label:delegation}}
 					\only<13-19>{\item	the aborts are the major bottleneck for \ref{label:noWait}}
 					\only<14-19>{\item	latching overhead and deadlocks $\rightarrow$ \ref{label:noWait} outperforms \ref{label:dlDetect} for \ref{label:se}}
 					\only<16-21>{\item	for update--only \ref{label:noWait} and \ref{label:2vNoWait} behave identical}
-					\only<18-22>{\item	\ref{label:silo} causes less aborts than \ref{label:dlDetect} due its optimism}
+					\only<18-22>{\item	\ref{label:silo} causes less aborts \mbox{than \ref{label:dlDetect} due its optimism}}
 					\only<20-22>{\item	long commit latencies of \ref{label:delegation} cause high update contention and therefore many aborts (low $\left[\si{\mega\transactions\per\second}\right]$) for \ref{label:silo}}
 					\only<22->{\item	coarse--grained partition locking of \ref{label:pse} is identical for read and update}
 					\only<23->{\item	\ref{label:pse} scales according to the number of hot records (each transaction locks 2 of 16 (hot) partitions)}
