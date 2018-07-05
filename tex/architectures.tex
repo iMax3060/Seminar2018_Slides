@@ -8,14 +8,14 @@
 		\centering
 		\resizebox{!}{.975\architecturesheight}{%
 			\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-				Shared Everything/ Non-Partitioned	&	\seDiagram		&	\doraDiagram	&	Data-Oriented Transaction Execution (DORA)	\\
+				Shared Everything/ Non--Partitioned	&	\seDiagram		&	\doraDiagram	&	Data--Oriented Transaction Execution (DORA)	\\
 				Delegation					&	\delegationDiagram	&	\pseDiagram	&	Partitioned Serial Execution (PSE)
 			\end{tabular}%
 		}%
 	}
 \end{frame}
 
-\subsection[Shared Everything/\-Non-Partitioned]{Shared Everything/\-Non-Partitioned (SE/NP)}
+\subsection[Shared Everything/\-Non--Partitioned]{Shared Everything/\-Non--Partitioned (SE/NP)}
 
 \begin{frame}
 	\vbox to .6\textheight{%
@@ -26,7 +26,7 @@
 		\only<1>{%
 			\resizebox{!}{.975\architecturesheight}{%
 				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-					Shared Everything/ Non-Partitioned	&	\seDiagram			&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					Shared Everything/ Non--Partitioned	&	\seDiagram			&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data--Oriented Transaction Execution (DORA)}	\\
 					\textcolor{black!50}{Delegation}		&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
 				\end{tabular}%
 			}%
@@ -48,7 +48,7 @@
 		\item	data and indices are not partitioned
 		\item[$\rightarrow$]	logical synchronization using a concurrency control protocol also required
 		\item	transactions completely executed by one thread
-		\item	thread-assignment depends only on load
+		\item	thread--assignment depends only on load
 	\end{itemize}
 \end{frame}
 
@@ -79,14 +79,14 @@
 		\node[visible on = <3-13>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
-					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
+					\begin{axis}[xlabel = {TPC--C runtime $\left[\si{\second}\right]$},
 							  xlabel near ticks,
 							  xmin = 0,
 							  xmax = 0.9,
 							  xtick distance = {0.1},
 							  scaled x ticks = false,
 							  minor x tick num = 9,
-							  ylabel = {TPC-C district},
+							  ylabel = {TPC--C district},
 							  ylabel near ticks,
 							  ymin = 0,
 							  ymax = 100,
@@ -162,7 +162,7 @@
 							\node[draw, volatile]		(red)		[left = 4cm of 0.center, anchor = north]		{};
 							\node[]					(legred)	[right = 0cm of red.east, anchor = west]		{\footnotesize Volatile};
 							\node[draw, nonvolatile]		(green)	[below = 0.2cm of red.south, anchor = north]	{};
-							\node[]					(leggreen)	[right = 0cm of green.east, anchor = west]		{\footnotesize Non-volatile};
+							\node[]					(leggreen)	[right = 0cm of green.east, anchor = west]		{\footnotesize Non--volatile};
 	
 							% Storage layer names:
 							\node[]	(reg)		[above = 0cm of 1.center, anchor = south]		{\footnotesize Registers};
@@ -170,8 +170,8 @@
 							\node[]	(l2)		[above = 0cm of 2b.center, anchor = south]	{\footnotesize L2 Cache};
 							\node[]	(l3)		[above = 0cm of 2c.center, anchor = south]	{\footnotesize L3 Cache};
 							\node[]	(mem)	[above = 0.05cm of 3.center, anchor = south]	{\small Main Memory};
-							\node[]	(ssd)		[above = 0.05cm of 4.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - SDD}};
-							\node[]	(mas)	[above = 0.05cm of 5.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.) - HDD}};
+							\node[]	(ssd)		[above = 0.05cm of 4.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.): SDD}};
+							\node[]	(mas)	[above = 0.05cm of 5.center, anchor = south]	{\small Online Storage \scriptsize \textit{(Secondary S.): HDD}};
 							\node[]	(mem)	[above = 0.05cm of 6.center, anchor = south]	{\small Offline Storage \scriptsize \textit{(Tertiary Storage)}};
 	
 							% Anchor points for the brace used to mark the example data from Intel Xeon:
@@ -244,7 +244,7 @@
 							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
 								(41.center) -- (51.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\numrange{5}{20}\si{\milli\second} \tiny \cite{EntHDD} \cite{HDD2016}};
 							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
-								(51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {$s - min$};
+								(51.center) -- (61.center) node[black, midway, xshift = 0.1cm, yshift = 0.1cm, anchor = west] {\si{\second}--\si{\minute}};
 	
 							% Mark the source of the performance data of the volatile layers:
 							\draw [decorate, decoration = {brace, amplitude = 3.75pt}]
@@ -276,7 +276,7 @@
 										  anchor = north},
 							   width = \linewidth,
 							   height = .7\textheight,
-							   title= {Throughput of Inter-Process Communication Mechanisms (\cite{Porobic:2012})}]
+							   title= {Throughput of Inter--Process Communication Mechanisms (\cite{Porobic:2012})}]
 						\addplot[style = {blue, fill = blue, mark = none}]	coordinates {({FIFO}, 58.9078) ({POSIX Message Queues}, 61.5127) ({Pipes}, 59.832) ({TCP Sockets}, 21.2451) ({UNIX Sockets}, 66.8908)};
 						\addplot[style = {red, fill = red, mark = none}]	coordinates {({FIFO}, 41.5969) ({POSIX Message Queues}, 42.6893) ({Pipes}, 40.0843) ({TCP Sockets}, 16.6391) ({UNIX Sockets}, 44.454)};
 
@@ -288,7 +288,7 @@
 	\end{tikzpicture}
 \end{frame}
 
-\subsection[DORA]{Data-Oriented Transaction Execution (DORA)}
+\subsection[DORA]{Data--Oriented Transaction Execution (DORA)}
 
 \begin{frame}
 	\vbox to .6\textheight{%
@@ -299,7 +299,7 @@
 		\only<1>{%
 			\resizebox{!}{.975\architecturesheight}{%
 				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram		&	Data-Oriented Transaction Execution (DORA)			\\
+					\textcolor{black!50}{Shared Everything/ Non--Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram		&	Data--Oriented Transaction Execution (DORA)			\\
 					\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
 				\end{tabular}%
 			}%
@@ -404,7 +404,7 @@
 					\only<15>{\textbf{Locks:}		&	$\left(0, S\right)_0$					\\	\hline}%
 					\only<16>{\textbf{Locks:}		&	$\left(0, S\right)_0, \left(1, S\right)_0$	\\	\hline}%
 					\only<17->{\textbf{Locks:}		&									\\	\hline}%
-					\textbf{Partition:}			&	$0-1, ...$							\\	\hline
+					\textbf{Partition:}			&	$\numrange{0}{1}, ...$							\\	\hline
 					
 				\end{tabular}%
 										};
@@ -426,7 +426,7 @@
 					\only<8>{\textbf{Locks:}		&	$\left(3, S\right)_0$					\\	\hline}%
 					\only<9-20>{\textbf{Locks:}	&	$\left(3, S\right)_0, \left(2, X\right)_0$	\\	\hline}%
 					\only<21->{\textbf{Locks:}		&									\\	\hline}%
-					\textbf{Partition:}			&	$2-3, ...$							\\	\hline
+					\textbf{Partition:}			&	$\numrange{2}{3}, ...$							\\	\hline
 					
 				\end{tabular}%
 										};
@@ -447,7 +447,7 @@
 					\only<-3>{\textbf{Locks:}		&						\\	\hline}%
 					\only<4-24>{\textbf{Locks:}	&	$\left(5, S\right)_0$		\\	\hline}%
 					\only<25->{\textbf{Locks:}		&						\\	\hline}%
-					\textbf{Partition:}			&	$4-5, ...$				\\	\hline
+					\textbf{Partition:}			&	$\numrange{4}{5}, ...$				\\	\hline
 					
 				\end{tabular}%
 										};
@@ -484,25 +484,25 @@
 		\item[$+$]	each thread accesses only the records of its partition
 			\begin{itemize}
 				\item[$+$]	each CPU cache may contain only data of its partition \\ \bm{$\rightarrow$} lower cache pollution
-				\item[$+$]	each CPU may access only data of its partitions \\ \bm{$\rightarrow$} no data movement between NUMA regions (for single-CPU transactions)
+				\item[$+$]	each CPU may access only data of its partitions \\ \bm{$\rightarrow$} no data movement between NUMA regions (for single--CPU transactions)
 				\item[$\rightarrow$]	No physical synchronization required!
 			\end{itemize}
 		\item[$+$]	logical partitioning allows fast repartitioning when the workload changes
-		\item[$+$]	intra-transaction parallelism could be exploited for multi-site transactions
+		\item[$+$]	intra--transaction parallelism could be exploited for multi--site transactions
 	\end{itemize}
 	
 	\begin{tikzpicture}[remember picture, overlay]
 		\node[visible on = <2>, shape = rectangle, draw = black, fill = black!0] at (current page.center) {%
 			\begin{adjustbox}{width = .85\enhancedtextwidth}%
 				\begin{tikzpicture}
-					\begin{axis}[xlabel = {TPC-C runtime $\left[\si{\second}\right]$},
+					\begin{axis}[xlabel = {TPC--C runtime $\left[\si{\second}\right]$},
 							  xlabel near ticks,
 							  xmin = 0,
 							  xmax = 0.9,
 							  xtick distance = {0.1},
 							  scaled x ticks = false,
 							  minor x tick num = 9,
-							  ylabel = {TPC-C district},
+							  ylabel = {TPC--C district},
 							  ylabel near ticks,
 							  ymin = 0,
 							  ymax = 100,
@@ -538,7 +538,7 @@
 	\begin{itemize}
 		\item[$-$]	partitioning required (e.g. manual selection of a partitioning strategy---\textit{called routing rule})
 		\item[$-$]	partitioning is sensitive to the workload
-		\item[$-$]	multi-site transactions require expensive fiber-migration (probably between NUMA regions)
+		\item[$-$]	multi--site transactions require expensive fiber--migration (probably between NUMA regions)
 		\item[$-$]	accessed partitions need to be calculated during query analysis for optimal performance \\ \bm{$\rightarrow$} slower accesses with secondary index
 		\item[$-$]	primary index is shared \\ \bm{$\rightarrow$} centralized latching for inserts/\-deletes still required \\ \bm{$\rightarrow$} some contention on the shared latch
 		\item[$-$]	centralized deadlock detection still required (for \lstinline{DL\_DETECT})
@@ -556,7 +556,7 @@
 		\only<1>{%
 			\resizebox{!}{.975\architecturesheight}{%
 				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]	&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					\textcolor{black!50}{Shared Everything/ Non--Partitioned}	&	\seDiagram[0.5]	&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data--Oriented Transaction Execution (DORA)}	\\
 					Delegation									&	\delegationDiagram	&	\pseDiagram[0.5]	&	\textcolor{black!50}{Partitioned Serial Execution (PSE)}
 				\end{tabular}%
 			}%
@@ -580,7 +580,7 @@
 		\only<1>{%
 			\resizebox{!}{.975\architecturesheight}{%
 				\begin{tabular}{>{\raggedleft}m{.15\linewidth}cc>{\raggedright}m{.15\linewidth}}
-					\textcolor{black!50}{Shared Everything/ Non-Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data-Oriented Transaction Execution (DORA)}	\\
+					\textcolor{black!50}{Shared Everything/ Non--Partitioned}	&	\seDiagram[0.5]		&	\doraDiagram[0.5]	&	\textcolor{black!50}{Data--Oriented Transaction Execution (DORA)}	\\
 					\textcolor{black!50}{Delegation}						&	\delegationDiagram[0.5]	&	\pseDiagram		&	Partitioned Serial Execution (PSE)
 				\end{tabular}%
 			}%
@@ -599,13 +599,13 @@
 	\frametitle{Summary}
 
 	\centering
-	\begin{tabular}{|>{\raggedright}m{\widthof{DORA}}|>{\raggedright}m{\widthof{Message}}|>{\raggedright}m{\widthof{thread-to-data}}|>{\raggedright}m{\widthof{\textbf{Synchro-}}}|>{\raggedright}m{\widthof{Transaction}}|}
+	\begin{tabular}{|>{\raggedright}m{\widthof{DORA}}|>{\raggedright}m{\widthof{Message}}|>{\raggedright}m{\widthof{thread--to--data}}|>{\raggedright}m{\widthof{\textbf{Synchro-}}}|>{\raggedright}m{\widthof{Transaction}}|}
 																																																																												\hline
 		\multirow{2}{*}{\centering\parbox[c]{\widthof{DORA}}{\centering\vspace{.75\baselineskip}\textbf{Ar\-chi\-tec\-ture}}}	&	\multicolumn{2}{c|}{\hspace{0pt}\visible<2->{\textbf{Process Management}}}											&	\multicolumn{2}{c|}{\parbox[c]{\widthof{\textbf{Transactional Storage}}}{\centering\vspace{.1\baselineskip}\hspace{0pt}\visible<4->{\textbf{Transactional Storage Management}}\vspace{.1\baselineskip}}} 	\\	\cline{2-5}
 																								&	\hspace{0pt}\visible<2->{\centering\textbf{Pa\-ral\-lel\-ism}}	&	\hspace{0pt}\visible<3->{\centering\textbf{Thread Assignment}}	&	\hspace{0pt}\visible<4->{\centering\textbf{Logical Synchronization}}	&	\hspace{0pt}\visible<5->{\centering\textbf{Physical Synchronization}}													\\	\hline
-		SE/NP																					&	\hspace{0pt}\visible<2->{Shared Memory}	 				& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				&	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{latch/\-atomics}																		\\	\hline
-		PSE																						&	\hspace{0pt}\visible<2->{Shared Nothing}	 				& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				& 	\hspace{0pt}\visible<4->{Partition Lock	}						& 	\hspace{0pt}\visible<5->{partition lock}																		\\	\hline
-		De\-le\-ga\-tion																				&	\hspace{0pt}\visible<2->{Message Passing}	 			& 	\hspace{0pt}\visible<3->{thread-to-txn}	 				& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Message Passing}																	\\	\hline
-		DORA																					&	\hspace{0pt}\visible<2->{Shared Memory}					& 	\hspace{0pt}\visible<3->{thread-to-data}					& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Transaction Migration}																	\\	\hline
+		SE/NP																					&	\hspace{0pt}\visible<2->{Shared Memory}	 				& 	\hspace{0pt}\visible<3->{thread--to--txn}	 				&	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{latch/\-atomics}																		\\	\hline
+		PSE																						&	\hspace{0pt}\visible<2->{Shared Nothing}	 				& 	\hspace{0pt}\visible<3->{thread--to--txn}	 				& 	\hspace{0pt}\visible<4->{Partition Lock	}						& 	\hspace{0pt}\visible<5->{partition lock}																		\\	\hline
+		De\-le\-ga\-tion																				&	\hspace{0pt}\visible<2->{Message Passing}	 			& 	\hspace{0pt}\visible<3->{thread--to--txn}	 				& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Message Passing}																	\\	\hline
+		DORA																					&	\hspace{0pt}\visible<2->{Shared Memory}					& 	\hspace{0pt}\visible<3->{thread--to--data}					& 	\hspace{0pt}\visible<4->{CC Protocols}	 					& 	\hspace{0pt}\visible<5->{Transaction Migration}																	\\	\hline
 	\end{tabular}
 \end{frame}

@@ -10,7 +10,7 @@
 			\begin{tabular}{c c c c}
 				\dlDetectDiagram		&	\noWaitDiagram	&	\twoVNoWaitDiagram	&	\siloDiagram	\\
 				\lstinline{DL\_DETECT}	&	\lstinline{NO\_WAIT}	&	\lstinline{2V\_NO\_WAIT}	&	\lstinline{SILO}	\\
-				(2PL)				&	(No-Waiting-2PL)	&	(Two-Version-2PL)		&	(OCC)
+				(2PL)				&	(No--Waiting--2PL)	&	(Two--Version--2PL)		&	(OCC)
 			\end{tabular}%
 		}%
 	}
@@ -28,7 +28,7 @@
 			\begin{tabular}{c c c c}
 				\dlDetectDiagram		&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
 				\lstinline{DL\_DETECT}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-				(2PL)				&	\textcolor{black!50}{(No-Waiting-2PL)}	&	\textcolor{black!50}{(Two-Version-2PL)}		&	\textcolor{black!50}{(OCC)}
+				(2PL)				&	\textcolor{black!50}{(No--Waiting--2PL)}	&	\textcolor{black!50}{(Two--Version--2PL)}		&	\textcolor{black!50}{(OCC)}
 			\end{tabular}%
 		}%
 	}
@@ -42,7 +42,7 @@
 		\item	transactions lock database objects (databases, tables, records, key ranges, etc.) before reading (shared mode $S$) or updating (exclusive mode $X$) them	\cite{Mohan:1990}
 		\item	$t_0$ tries to acquire lock held by $t_1$ in compatible mode \\ \bm{$\rightarrow$} $t_0$ can immediately acquire lock as well (starvation needs to be prevented)
 		\item	$t_0$ tries to acquire lock held by $t_1$ in incompatible mode \\ \bm{$\rightarrow$} $t_0$ waits until $t_1$ releases lock
-		\item	deadlock detection using a repeatedly generated and analyzed wait-for graph
+		\item	deadlock detection using a repeatedly generated and analyzed wait--for graph
 	\end{itemize}
 	\newcommand{\plus}{\textcolor{green!15}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{green}{\kern-0.9em\bm{$\oplus$}}}
 	\newcommand{\minus}{\textcolor{red!25}{\LARGE\raisebox{-.0875em}{\bm{$\bullet$}}}\textcolor{red}{\kern-0.9em\bm{$\ominus$}}}
@@ -184,7 +184,7 @@
 			};
 			\node[draw = none, right = 0em of f2.north east, anchor = north west](fmore)			{$...$};
 			
-			\node[identifier, below = 10em of lock]						(wfg)				{Wait-for Graph:};
+			\node[identifier, below = 10em of lock]						(wfg)				{Wait--for Graph:};
 			
 			\node[visible on = <4-14>, transaction, below = 1em of wfg]		(wt1)				{$t_1$};
 			\node[visible on = <2-10>, transaction, left = 3em of wt1]			(wt0)				{$t_0$};
@@ -207,14 +207,14 @@
 		\visible<1->{\item[$+$]	aborts only after deadlocks}
 		\visible<2->{\item[$-$]	deadlocks are possible}
 		\visible<2->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
-		\visible<2->{\item[$-$]	calculation and analysis of wait-for graph expensive \\ \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
+		\visible<2->{\item[$-$]	calculation and analysis of wait--for graph expensive \\ \bm{$\rightarrow$} done offline \bm{$\rightarrow$} transactions deadlocked for a while}
 		\visible<2->{\item[$-$]	aborts happen \\ \bm{$\rightarrow$} work done before needs to be repeated}
 		\visible<2->{\item[$-$]	queue of waiters requires latching \\ \bm{$\rightarrow$} limits scalability}
 		\visible<2->{\item[$-$]	even writes need to acquire latches and wait}
 	\end{itemize}
 \end{frame}
 
-\subsection[\lstinline{NO\_WAIT}]{\lstinline{NO\_WAIT} (No-Waiting-2PL)}
+\subsection[\lstinline{NO\_WAIT}]{\lstinline{NO\_WAIT} (No--Waiting--2PL)}
 
 \begin{frame}
 	\vbox to .6\textheight{%
@@ -226,14 +226,14 @@
 			\begin{tabular}{c c c c}
 				\dlDetectDiagram[0.5]					&	\noWaitDiagram	&	\twoVNoWaitDiagram[0.5]					&	\siloDiagram[0.5]				\\
 				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\lstinline{NO\_WAIT}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-				\textcolor{black!50}{(2PL)}					&	(No-Waiting-2PL)	&	\textcolor{black!50}{(Two-Version-2PL)}		&	\textcolor{black!50}{(OCC)}
+				\textcolor{black!50}{(2PL)}					&	(No--Waiting--2PL)	&	\textcolor{black!50}{(Two--Version--2PL)}		&	\textcolor{black!50}{(OCC)}
 			\end{tabular}%
 		}%
 	}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Properties of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
+	\frametitle{Properties of \lstinline{NO\_WAIT} (No--Waiting--2PL)}
 	
 	\begin{itemize}
 		\item	pessimistic concurrency control protocol
@@ -382,18 +382,18 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No-Waiting-2PL)}
+	\frametitle{Pros \& Cons of \lstinline{NO\_WAIT} (No--Waiting--2PL)}
 	
 	\begin{itemize}
 		\visible<1->{\item[$+$]	deadlocks are impossible}
 		\visible<1->{\item[$+$]	locks can be implemented using a semaphore and atomics \\ \bm{$\rightarrow$} scales better than latches}
-		\visible<1->{\item[$+$]	no need to expensively calculate and analysis a wait-for graph}
-		\visible<2->{\item[$-$]	many lock conflicts for update-intensive high-contention workloads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
+		\visible<1->{\item[$+$]	no need to expensively calculate and analysis a wait--for graph}
+		\visible<2->{\item[$-$]	many lock conflicts for update--intensive high--contention workloads \\ \bm{$\rightarrow$} many aborts \bm{$\rightarrow$} work done before needs to be repeated}
 		\visible<2->{\item[$-$]	locks prevent concurrency too often (e.g. blind writes)}
 	\end{itemize}
 \end{frame}
 
-\subsection[\lstinline{2V\_NO\_WAIT}]{\lstinline{2V\_NO\_WAIT} (Two-Version-2PL)}
+\subsection[\lstinline{2V\_NO\_WAIT}]{\lstinline{2V\_NO\_WAIT} (Two--Version--2PL)}
 
 \begin{frame}
 	\vbox to .6\textheight{%
@@ -405,7 +405,7 @@
 			\begin{tabular}{c c c c}
 				\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram	&	\siloDiagram[0.5]				\\
 				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\lstinline{2V\_NO\_WAIT}	&	\textcolor{black!50}{\lstinline{SILO}}	\\
-				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No-Waiting-2PL)}	&	(Two-Version-2PL)		&	\textcolor{black!50}{(OCC)}
+				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No--Waiting--2PL)}	&	(Two--Version--2PL)		&	\textcolor{black!50}{(OCC)}
 			\end{tabular}%
 		}%
 	}
@@ -423,7 +423,7 @@
 			\begin{tabular}{c c c c}
 				\dlDetectDiagram[0.5]					&	\noWaitDiagram[0.5]					&	\twoVNoWaitDiagram[0.5]							&	\siloDiagram			\\
 				\textcolor{black!50}{\lstinline{DL\_DETECT}}	&	\textcolor{black!50}{\lstinline{NO\_WAIT}}	&	\textcolor{black!50}{\lstinline{2V\_NO\_WAIT}}	&	\lstinline{SILO}	\\
-				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No-Waiting-2PL)}	&	\textcolor{black!50}{(Two-Version-2PL)}				&	(OCC)
+				\textcolor{black!50}{(2PL)}					&	\textcolor{black!50}{(No--Waiting--2PL)}	&	\textcolor{black!50}{(Two--Version--2PL)}				&	(OCC)
 			\end{tabular}%
 		}%
 	}

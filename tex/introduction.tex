@@ -42,16 +42,16 @@
 	\frametitle{Some Implications of those Requirements}
 
 	\begin{itemize}
-		\item	work purely in-memory when the working set completely fits in main memory
+		\item	work purely in--memory when the working set completely fits in main memory
 		\item proper utilization of the computational resources is required
 			\begin{itemize}
 				\item available CPU time (usually not the bottleneck)
 				\item available hardware contexts (simultaneous threads)
-				\item Cache Oblivious Algorithms (e.g. partitioning Hash-JOINs)
-				\item[$\rightarrow$] Interleaved transaction execution to exploit abundant thread-level parallelism without violating the ACID properties!
-				\item[$\rightarrow$] Interleaved operation execution to exploit intra-transaction parallelism!
+				\item Cache Oblivious Algorithms (e.g. partitioning Hash--JOINs)
+				\item[$\rightarrow$] Interleaved transaction execution to exploit abundant thread--level parallelism without violating the ACID properties!
+				\item[$\rightarrow$] Interleaved operation execution to exploit intra--transaction parallelism!
 			\end{itemize}
 		\item[$\rightarrow$] physical \& logical Synchronization
-		\uncover<2->{\item[\textcolor{red}{\bm{$\rightarrow$}}] \textcolor{red}{\textbf{Limits concurrency for high-contention workloads!}}}
+		\uncover<2->{\item[\textcolor{red}{\bm{$\rightarrow$}}] \textcolor{red}{\textbf{Limits concurrency for high--contention workloads!}}}
 	\end{itemize}
 \end{frame}
